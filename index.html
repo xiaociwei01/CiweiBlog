@@ -64,9 +64,11 @@
         .token-area { margin-top: 12px; display: none; }
         .token-area.show { display: block; }
         .token-area input { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; }
-        .status-msg { font-size: 13px; margin-top: 6px; }
-        .status-msg.success { color: #28a745; }
-        .status-msg.error { color: #d14a4a; }
+        .token-status { font-size: 13px; margin-top: 6px; }
+        .token-status.success { color: #28a745; }
+        .token-status.error { color: #d14a4a; }
+        .token-status .forget-link { color: #888; cursor: pointer; text-decoration: underline; margin-left: 10px; }
+        .token-status .forget-link:hover { color: #d14a4a; }
     </style>
 </head>
 <body>
@@ -79,38 +81,85 @@
 
     <div class="actions">
         <a href="write.html" class="write-btn">✍️ 写新文章</a>
-        <button class="token-toggle-btn" id="tokenToggleBtn">🔑 输入 Token（删除需要）</button>
+        <button class="token-toggle-btn" id="tokenToggleBtn">🔑 管理 Token</button>
     </div>
 
     <div class="token-area" id="tokenArea">
         <input type="password" id="tokenInput" placeholder="ghp_xxxxx（输入你的 GitHub Token）">
-        <div id="tokenStatus" class="status-msg"></div>
+        <div id="tokenStatus" class="token-status"></div>
     </div>
 
     <script>
         const REPO = 'xiaociwei01/CiweiBlog';
         const POSTS_PATH = 'posts';
         const API_URL = `https://api.github.com/repos/${REPO}/contents/${POSTS_PATH}`;
+        const STORAGE_KEY = 'ciwei_blog_token';
 
         let token = '';
 
-        // ===== Token 显示/隐藏 =====
+        // ===== 加载保存的 Token =====
+        function loadSavedToken() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                token = saved;
+                document.getElementById('tokenInput').value = saved;
+                document.getElementById('tokenStatus').innerHTML = `
+                    ✅ Token 已加载（存储在本地）
+                    <span class="forget-link" onclick="forgetToken()">忘记</span>
+                `;
+                document.getElementById('tokenStatus').className = 'token-status success';
+                return true;
+            }
+            return false;
+        }
+
+        // ===== 保存 Token =====
+        function saveToken(t) {
+            if (t && t.startsWith('ghp_')) {
+                localStorage.setItem(STORAGE_KEY, t);
+                token = t;
+                document.getElementById('tokenStatus').innerHTML = `
+                    ✅ Token 已保存（存储在本地）
+                    <span class="forget-link" onclick="forgetToken()">忘记</span>
+                `;
+                document.getElementById('tokenStatus').className = 'token-status success';
+                return true;
+            } else if (!t) {
+                forgetToken();
+                return false;
+            } else {
+                document.getElementById('tokenStatus').textContent = '⚠️ Token 格式不正确，应以 ghp_ 开头';
+                document.getElementById('tokenStatus').className = 'token-status error';
+                return false;
+            }
+        }
+
+        // ===== 忘记 Token（清除存储） =====
+        function forgetToken() {
+            localStorage.removeItem(STORAGE_KEY);
+            token = '';
+            document.getElementById('tokenInput').value = '';
+            document.getElementById('tokenStatus').textContent = 'Token 已清除';
+            document.getElementById('tokenStatus').className = 'token-status';
+            document.getElementById('tokenArea').classList.remove('show');
+        }
+
+        // ===== Token 输入事件 =====
+        document.getElementById('tokenInput').addEventListener('input', function() {
+            const val = this.value.trim();
+            if (val) {
+                saveToken(val);
+            } else {
+                forgetToken();
+            }
+        });
+
+        // ===== 显示/隐藏 Token 面板 =====
         document.getElementById('tokenToggleBtn').addEventListener('click', function() {
             const area = document.getElementById('tokenArea');
             area.classList.toggle('show');
             if (area.classList.contains('show')) {
                 document.getElementById('tokenInput').focus();
-            }
-        });
-
-        document.getElementById('tokenInput').addEventListener('input', function() {
-            token = this.value.trim();
-            if (token) {
-                document.getElementById('tokenStatus').textContent = '✅ Token 已保存（仅本次会话有效）';
-                document.getElementById('tokenStatus').className = 'status-msg success';
-            } else {
-                document.getElementById('tokenStatus').textContent = '';
-                document.getElementById('tokenStatus').className = 'status-msg';
             }
         });
 
@@ -170,15 +219,19 @@
             const filename = li.dataset.filename;
             const sha = li.dataset.sha;
 
-            // 检查 Token
+            // 检查 Token（先从 localStorage 读取）
             if (!token) {
-                alert('⚠️ 请先输入 GitHub Token（点击页面上的 "输入 Token" 按钮）');
-                document.getElementById('tokenArea').classList.add('show');
-                document.getElementById('tokenInput').focus();
-                return;
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    token = saved;
+                } else {
+                    alert('⚠️ 请先输入 GitHub Token（点击页面上的 "管理 Token" 按钮）');
+                    document.getElementById('tokenArea').classList.add('show');
+                    document.getElementById('tokenInput').focus();
+                    return;
+                }
             }
 
-            // 确认删除
             if (!confirm(`确定要删除「${filename}」吗？此操作不可撤销！`)) return;
 
             btn.disabled = true;
@@ -200,13 +253,11 @@
                 });
 
                 if (res.ok) {
-                    // 从 DOM 中移除
                     li.style.opacity = '0.3';
                     li.style.transition = 'opacity 0.3s';
                     setTimeout(() => li.remove(), 300);
-                    // 显示成功消息
                     const statusMsg = document.createElement('div');
-                    statusMsg.className = 'status-msg success';
+                    statusMsg.className = 'token-status success';
                     statusMsg.textContent = `✅ 已删除「${filename}」`;
                     document.getElementById('post-list').prepend(statusMsg);
                     setTimeout(() => statusMsg.remove(), 3000);
@@ -223,7 +274,8 @@
             }
         }
 
-        // ===== 加载文章 =====
+        // ===== 初始化 =====
+        loadSavedToken();
         fetchPosts();
     </script>
 </body>
