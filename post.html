@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>阅读文章</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, 'PingFang SC', 'Segoe UI', Roboto, sans-serif;
+            background: #ffffff;
+            color: #1a1a2e;
+            padding: 24px 20px 60px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+        .meta { color: #888; font-size: 14px; margin-bottom: 30px; }
+        .content { line-height: 1.8; font-size: 17px; }
+        .content img { max-width: 100%; border-radius: 8px; margin: 16px 0; }
+        .content video { max-width: 100%; border-radius: 8px; margin: 16px 0; }
+        .back { display: inline-block; margin-top: 30px; color: #888; text-decoration: none; }
+        .back:hover { color: #1a1a2e; }
+        .tags { display: inline-block; background: #f0f0f0; padding: 2px 10px; border-radius: 12px; font-size: 13px; color: #666; margin-right: 6px; }
+        .error { color: #d14a4a; text-align: center; padding: 60px 0; }
+    </style>
+</head>
+<body>
+    <div id="post-content">
+        <div class="error">加载中...</div>
+    </div>
+    <a href="index.html" class="back">← 返回博客首页</a>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const filename = params.get('file');
+        if (!filename) {
+            document.getElementById('post-content').innerHTML = '<div class="error">没有指定文章</div>';
+        } else {
+            const REPO = 'xiaociwei01/CiweiBlog';
+            const RAW_URL = `https://raw.githubusercontent.com/${REPO}/main/posts/${filename}`;
+
+            fetch(RAW_URL)
+                .then(res => {
+                    if (!res.ok) throw new Error('文章不存在');
+                    return res.text();
+                })
+                .then(markdown => {
+                    // 简单解析 frontmatter
+                    const lines = markdown.split('\n');
+                    let title = '无标题', date = '', tags = '', bodyStart = 0;
+                    if (lines[0] === '---') {
+                        let end = lines.indexOf('---', 1);
+                        if (end !== -1) {
+                            const front = lines.slice(1, end);
+                            front.forEach(line => {
+                                if (line.startsWith('title:')) title = line.replace('title:', '').trim();
+                                if (line.startsWith('date:')) date = line.replace('date:', '').trim();
+                                if (line.startsWith('tags:')) tags = line.replace('tags:', '').trim();
+                            });
+                            bodyStart = end + 1;
+                        }
+                    }
+                    const body = lines.slice(bodyStart).join('\n');
+
+                    // 简单 Markdown 渲染（支持标题、列表、加粗、图片、视频）
+                    let html = body
+                        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                        .replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1">')
+                        .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>')
+                        .replace(/\n/g, '<br>')
+                        .replace(/<br>-\s/g, '<br>• ');
+
+                    // 视频支持（直接输出 video 标签）
+                    html = html.replace(/<br>video:(.*?)<br>/g, '<br><video controls src="$1" style="max-width:100%;border-radius:8px;"><br>');
+
+                    const tagArray = tags.split(',').map(t => t.trim()).filter(t => t);
+                    const tagHtml = tagArray.map(t => `<span class="tags">#${t}</span>`).join(' ');
+
+                    document.getElementById('post-content').innerHTML = `
+                        <h1>${title}</h1>
+                        <div class="meta">${date} ${tagHtml}</div>
+                        <div class="content">${html}</div>
+                    `;
+                })
+                .catch(err => {
+                    document.getElementById('post-content').innerHTML = `<div class="error">${err.message}</div>`;
+                });
+        }
+    </script>
+</body>
+</html>

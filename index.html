@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>刺猬的博客</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, 'PingFang SC', 'Segoe UI', Roboto, sans-serif;
+            background: #ffffff;
+            color: #1a1a2e;
+            padding: 24px 20px 60px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+        .sub { color: #888; font-size: 14px; margin-bottom: 32px; }
+        .post-list { list-style: none; padding: 0; }
+        .post-item { padding: 16px 0; border-bottom: 1px solid #eee; }
+        .post-item a { text-decoration: none; color: #1a1a2e; display: block; }
+        .post-item .title { font-size: 20px; font-weight: 600; }
+        .post-item .meta { font-size: 13px; color: #999; margin-top: 4px; }
+        .post-item .tags { display: inline-block; background: #f0f0f0; padding: 2px 10px; border-radius: 12px; font-size: 12px; color: #666; margin-right: 6px; }
+        .empty { color: #aaa; text-align: center; padding: 60px 0; }
+        .write-btn { display: inline-block; background: #1a1a2e; color: #fff; padding: 10px 24px; border-radius: 40px; text-decoration: none; font-weight: 500; margin-top: 20px; }
+        .write-btn:hover { background: #2d2d4a; }
+    </style>
+</head>
+<body>
+    <h1>📝 刺猬的博客</h1>
+    <div class="sub">记录生活 · 分享想法</div>
+
+    <div id="post-list" class="post-list">
+        <div class="empty">加载中...</div>
+    </div>
+
+    <a href="write.html" class="write-btn">✍️ 写新文章</a>
+
+    <script>
+        // 从 GitHub API 读取文章列表
+        const REPO = 'xiaociwei01/CiweiBlog';
+        const TOKEN = '你的新Token（不要写在这里！）'; // 本方案不使用 Token，只读取公开内容
+
+        // 如果你的仓库是公开的，直接用这个 API 即可
+        const API_URL = `https://api.github.com/repos/${REPO}/contents/posts`;
+
+        async function fetchPosts() {
+            try {
+                const res = await fetch(API_URL);
+                if (!res.ok) throw new Error('无法读取文章列表');
+                const files = await res.json();
+                const posts = files.filter(f => f.name.endsWith('.md'));
+
+                if (posts.length === 0) {
+                    document.getElementById('post-list').innerHTML = '<div class="empty">还没有文章，写一篇吧 ✍️</div>';
+                    return;
+                }
+
+                // 按文件名倒序排列（文件名包含日期）
+                posts.sort((a, b) => b.name.localeCompare(a.name));
+
+                let html = '';
+                for (const post of posts) {
+                    // 提取文件名中的日期和标题（去掉 .md 后缀）
+                    const name = post.name.replace('.md', '');
+                    // 从文件内容获取标题（需要额外请求内容）
+                    const contentRes = await fetch(post.download_url);
+                    const contentText = await contentRes.text();
+                    // 提取 frontmatter 中的 title
+                    const titleMatch = contentText.match(/title:\s*(.+)/);
+                    const dateMatch = contentText.match(/date:\s*(.+)/);
+                    const tagsMatch = contentText.match(/tags:\s*(.+)/);
+                    const title = titleMatch ? titleMatch[1].trim() : name;
+                    const date = dateMatch ? dateMatch[1].trim() : '未知日期';
+                    const tags = tagsMatch ? tagsMatch[1].split(',').map(t => t.trim()) : [];
+
+                    html += `
+                        <li class="post-item">
+                            <a href="post.html?file=${encodeURIComponent(post.name)}">
+                                <div class="title">${title}</div>
+                                <div class="meta">
+                                    ${date}
+                                    ${tags.map(t => `<span class="tags">#${t}</span>`).join('')}
+                                </div>
+                            </a>
+                        </li>
+                    `;
+                }
+                document.getElementById('post-list').innerHTML = html;
+            } catch (err) {
+                document.getElementById('post-list').innerHTML = `<div class="empty">加载失败：${err.message}</div>`;
+            }
+        }
+
+        fetchPosts();
+    </script>
+</body>
+</html>,

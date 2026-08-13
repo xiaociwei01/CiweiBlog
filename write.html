@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>写新文章</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, 'PingFang SC', 'Segoe UI', Roboto, sans-serif;
+            background: #ffffff;
+            color: #1a1a2e;
+            padding: 24px 20px 60px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 { font-size: 28px; font-weight: 700; margin-bottom: 20px; }
+        label { display: block; font-weight: 500; margin: 16px 0 4px; }
+        input, textarea { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; font-family: inherit; }
+        textarea { min-height: 300px; resize: vertical; }
+        button { background: #1a1a2e; color: #fff; border: none; padding: 12px 30px; border-radius: 40px; font-size: 16px; font-weight: 500; cursor: pointer; margin-top: 20px; }
+        button:hover { background: #2d2d4a; }
+        .status { margin-top: 12px; color: #888; }
+        .back { display: inline-block; margin-top: 12px; color: #888; text-decoration: none; }
+        .back:hover { color: #1a1a2e; }
+        .token-input { background: #f5f5f5; border: 1px solid #eee; padding: 6px 10px; border-radius: 6px; font-size: 13px; color: #555; width: 100%; }
+    </style>
+</head>
+<body>
+    <h1>✍️ 写新文章</h1>
+
+    <label>标题</label>
+    <input type="text" id="title" placeholder="文章标题">
+
+    <label>日期</label>
+    <input type="date" id="date">
+
+    <label>标签（用逗号分隔）</label>
+    <input type="text" id="tags" placeholder="日记, 生活">
+
+    <label>正文（Markdown 格式）</label>
+    <textarea id="body" placeholder="写点什么..."></textarea>
+
+    <label>GitHub Token</label>
+    <input type="password" class="token-input" id="token" placeholder="ghp_xxxxx（输入你的 Token）">
+
+    <button id="publish">🚀 发布文章</button>
+    <div id="status" class="status"></div>
+    <a href="index.html" class="back">← 返回博客首页</a>
+
+    <script>
+        const REPO = 'xiaociwei01/CiweiBlog';
+
+        document.getElementById('date').value = new Date().toISOString().slice(0,10);
+
+        document.getElementById('publish').addEventListener('click', async function() {
+            const title = document.getElementById('title').value.trim();
+            const date = document.getElementById('date').value;
+            const tags = document.getElementById('tags').value.trim();
+            const body = document.getElementById('body').value.trim();
+            const token = document.getElementById('token').value.trim();
+
+            if (!title || !body || !token) {
+                document.getElementById('status').textContent = '⚠️ 标题、正文和 Token 都不能为空';
+                return;
+            }
+
+            // 生成文件名：日期-标题（去掉特殊字符）
+            const slug = title.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '-');
+            const filename = `${date}-${slug}.md`;
+
+            // 构造 Markdown 内容（含 frontmatter）
+            const content = `---
+title: ${title}
+date: ${date}
+tags: ${tags}
+---
+
+${body}`;
+
+            // 调用 GitHub API 提交文件
+            const url = `https://api.github.com/repos/${REPO}/contents/posts/${filename}`;
+
+            try {
+                // 先检查文件是否存在（如果存在，需要获取 sha 才能更新）
+                let sha = '';
+                try {
+                    const checkRes = await fetch(url, {
+                        headers: { 'Authorization': `token ${token}` }
+                    });
+                    if (checkRes.ok) {
+                        const data = await checkRes.json();
+                        sha = data.sha;
+                    }
+                } catch (e) {}
+
+                const payload = {
+                    message: `添加文章: ${title}`,
+                    content: btoa(unescape(encodeURIComponent(content))),
+                    branch: 'main'
+                };
+                if (sha) payload.sha = sha;
+
+                const res = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    document.getElementById('status').innerHTML = '✅ 发布成功！<a href="index.html">点击返回首页查看</a>';
+                    document.getElementById('publish').disabled = true;
+                } else {
+                    const err = await res.json();
+                    document.getElementById('status').textContent = '❌ 发布失败：' + (err.message || '未知错误');
+                }
+            } catch (err) {
+                document.getElementById('status').textContent = '❌ 网络错误：' + err.message;
+            }
+        });
+    </script>
+</body>
+</html>
