@@ -20,10 +20,28 @@
         textarea { min-height: 300px; resize: vertical; }
         button { background: #1a1a2e; color: #fff; border: none; padding: 12px 30px; border-radius: 40px; font-size: 16px; font-weight: 500; cursor: pointer; margin-top: 20px; }
         button:hover { background: #2d2d4a; }
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
         .status { margin-top: 12px; color: #888; }
         .back { display: inline-block; margin-top: 12px; color: #888; text-decoration: none; }
         .back:hover { color: #1a1a2e; }
         .token-input { background: #f5f5f5; border: 1px solid #eee; padding: 6px 10px; border-radius: 6px; font-size: 13px; color: #555; width: 100%; }
+
+        /* 上传区域 */
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            color: #aaa;
+            margin: 12px 0;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .upload-area:hover { border-color: #1a1a2e; }
+        .upload-area input[type="file"] { display: none; }
+        .upload-status { font-size: 13px; color: #888; margin-top: 6px; }
+        .upload-status .success { color: #28a745; }
+        .upload-status .error { color: #d14a4a; }
     </style>
 </head>
 <body>
@@ -41,6 +59,15 @@
     <label>正文（Markdown 格式）</label>
     <textarea id="body" placeholder="写点什么..."></textarea>
 
+    <!-- ===== 上传区域 ===== -->
+    <label>📎 上传图片或视频（自动插入正文）</label>
+    <div class="upload-area" id="uploadArea">
+        <div>点击选择文件 或 拖拽到这里</div>
+        <div style="font-size:12px;color:#bbb;">支持 jpg, png, gif, webp, mp4, mov, webm</div>
+        <input type="file" id="fileInput" accept="image/*,video/*" multiple>
+    </div>
+    <div id="uploadStatus" class="upload-status">等待上传...</div>
+
     <label>GitHub Token</label>
     <input type="password" class="token-input" id="token" placeholder="ghp_xxxxx（输入你的 Token）">
 
@@ -50,26 +77,140 @@
 
     <script>
         const REPO = 'xiaociwei01/CiweiBlog';
+        const TOKEN_INPUT = document.getElementById('token');
+        const BODY = document.getElementById('body');
 
+        // ===== 日期默认今天 =====
         document.getElementById('date').value = new Date().toISOString().slice(0,10);
 
+        // ===== 上传文件 =====
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadStatus = document.getElementById('uploadStatus');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        // 拖拽支持
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#1a1a2e';
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = '#ddd';
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#ddd';
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFiles(e.dataTransfer.files);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFiles(e.target.files);
+            }
+        });
+
+        async function handleFiles(files) {
+            const token = TOKEN_INPUT.value.trim();
+            if (!token) {
+                uploadStatus.innerHTML = '<span class="error">⚠️ 请先填写 GitHub Token</span>';
+                return;
+            }
+
+            for (const file of files) {
+                // 检查文件大小（GitHub API 限制单个文件 < 100MB）
+                if (file.size > 100 * 1024 * 1024) {
+                    uploadStatus.innerHTML = `<span class="error">❌ ${file.name} 超过 100MB，无法上传</span>`;
+                    continue;
+                }
+
+                uploadStatus.innerHTML = `⏳ 上传 ${file.name} ...`;
+
+                try {
+                    // 读取文件为 base64
+                    const base64 = await readFileAsBase64(file);
+                    // 生成路径：images/年/月/文件名
+                    const date = new Date();
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const ext = file.name.split('.').pop();
+                    const baseName = file.name.replace(/\.[^.]+$/, '');
+                    const safeName = baseName.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '-');
+                    const filename = `${year}/${month}/${safeName}-${Date.now()}.${ext}`;
+                    const path = `images/${filename}`;
+
+                    // 调用 GitHub API 上传
+                    const url = `https://api.github.com/repos/${REPO}/contents/${path}`;
+                    const payload = {
+                        message: `上传文件: ${file.name}`,
+                        content: base64.split(',')[1], // 去掉 data:image/...;base64, 前缀
+                        branch: 'main'
+                    };
+
+                    const res = await fetch(url, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (res.ok) {
+                        // 生成 raw 链接
+                        const rawUrl = `https://raw.githubusercontent.com/${REPO}/main/${path}`;
+                        // 判断是图片还是视频
+                        const isVideo = file.type.startsWith('video/');
+                        const markdown = isVideo
+                            ? `<video controls src="${rawUrl}" style="max-width:100%;border-radius:8px;"></video>`
+                            : `![](${rawUrl})`;
+                        // 插入到正文光标位置或末尾
+                        const cursorPos = BODY.selectionStart || BODY.value.length;
+                        const before = BODY.value.substring(0, cursorPos);
+                        const after = BODY.value.substring(cursorPos);
+                        BODY.value = before + markdown + '\n\n' + after;
+                        // 触发 input 事件
+                        BODY.dispatchEvent(new Event('input'));
+
+                        uploadStatus.innerHTML = `<span class="success">✅ ${file.name} 上传成功，已插入正文</span>`;
+                    } else {
+                        const err = await res.json();
+                        uploadStatus.innerHTML = `<span class="error">❌ ${file.name} 上传失败：${err.message || '未知错误'}</span>`;
+                    }
+                } catch (err) {
+                    uploadStatus.innerHTML = `<span class="error">❌ ${file.name} 上传失败：${err.message}</span>`;
+                }
+            }
+        }
+
+        // 工具：读取文件为 base64
+        function readFileAsBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // ===== 发布文章 =====
         document.getElementById('publish').addEventListener('click', async function() {
             const title = document.getElementById('title').value.trim();
             const date = document.getElementById('date').value;
             const tags = document.getElementById('tags').value.trim();
             const body = document.getElementById('body').value.trim();
-            const token = document.getElementById('token').value.trim();
+            const token = TOKEN_INPUT.value.trim();
 
             if (!title || !body || !token) {
                 document.getElementById('status').textContent = '⚠️ 标题、正文和 Token 都不能为空';
                 return;
             }
 
-            // 生成文件名：日期-标题（去掉特殊字符）
             const slug = title.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '-');
             const filename = `${date}-${slug}.md`;
-
-            // 构造 Markdown 内容（含 frontmatter）
             const content = `---
 title: ${title}
 date: ${date}
@@ -78,11 +219,9 @@ tags: ${tags}
 
 ${body}`;
 
-            // 调用 GitHub API 提交文件
             const url = `https://api.github.com/repos/${REPO}/contents/posts/${filename}`;
 
             try {
-                // 先检查文件是否存在（如果存在，需要获取 sha 才能更新）
                 let sha = '';
                 try {
                     const checkRes = await fetch(url, {
