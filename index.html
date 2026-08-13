@@ -17,14 +17,56 @@
         h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
         .sub { color: #888; font-size: 14px; margin-bottom: 32px; }
         .post-list { list-style: none; padding: 0; }
-        .post-item { padding: 16px 0; border-bottom: 1px solid #eee; }
-        .post-item a { text-decoration: none; color: #1a1a2e; display: block; }
+        .post-item {
+            padding: 16px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .post-item .left { flex: 1; }
+        .post-item .left a { text-decoration: none; color: #1a1a2e; display: block; }
         .post-item .title { font-size: 20px; font-weight: 600; }
         .post-item .meta { font-size: 13px; color: #999; margin-top: 4px; }
         .post-item .tags { display: inline-block; background: #f0f0f0; padding: 2px 10px; border-radius: 12px; font-size: 12px; color: #666; margin-right: 6px; }
+
+        .post-item .right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin-left: 12px; }
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #ccc;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .delete-btn:hover { color: #d14a4a; background: #f5f5f5; }
+        .delete-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
         .empty { color: #aaa; text-align: center; padding: 60px 0; }
-        .write-btn { display: inline-block; background: #1a1a2e; color: #fff; padding: 10px 24px; border-radius: 40px; text-decoration: none; font-weight: 500; margin-top: 20px; }
-        .write-btn:hover { background: #2d2d4a; }
+        .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+        .write-btn, .token-toggle-btn {
+            display: inline-block;
+            background: #1a1a2e;
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+        }
+        .write-btn:hover, .token-toggle-btn:hover { background: #2d2d4a; }
+        .token-toggle-btn { background: #555; font-size: 13px; padding: 8px 18px; }
+        .token-toggle-btn:hover { background: #777; }
+        .token-area { margin-top: 12px; display: none; }
+        .token-area.show { display: block; }
+        .token-area input { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; }
+        .status-msg { font-size: 13px; margin-top: 6px; }
+        .status-msg.success { color: #28a745; }
+        .status-msg.error { color: #d14a4a; }
     </style>
 </head>
 <body>
@@ -35,16 +77,44 @@
         <div class="empty">加载中...</div>
     </div>
 
-    <a href="write.html" class="write-btn">✍️ 写新文章</a>
+    <div class="actions">
+        <a href="write.html" class="write-btn">✍️ 写新文章</a>
+        <button class="token-toggle-btn" id="tokenToggleBtn">🔑 输入 Token（删除需要）</button>
+    </div>
+
+    <div class="token-area" id="tokenArea">
+        <input type="password" id="tokenInput" placeholder="ghp_xxxxx（输入你的 GitHub Token）">
+        <div id="tokenStatus" class="status-msg"></div>
+    </div>
 
     <script>
-        // 从 GitHub API 读取文章列表
         const REPO = 'xiaociwei01/CiweiBlog';
-        const TOKEN = '你的新Token（不要写在这里！）'; // 本方案不使用 Token，只读取公开内容
+        const POSTS_PATH = 'posts';
+        const API_URL = `https://api.github.com/repos/${REPO}/contents/${POSTS_PATH}`;
 
-        // 如果你的仓库是公开的，直接用这个 API 即可
-        const API_URL = `https://api.github.com/repos/${REPO}/contents/posts`;
+        let token = '';
 
+        // ===== Token 显示/隐藏 =====
+        document.getElementById('tokenToggleBtn').addEventListener('click', function() {
+            const area = document.getElementById('tokenArea');
+            area.classList.toggle('show');
+            if (area.classList.contains('show')) {
+                document.getElementById('tokenInput').focus();
+            }
+        });
+
+        document.getElementById('tokenInput').addEventListener('input', function() {
+            token = this.value.trim();
+            if (token) {
+                document.getElementById('tokenStatus').textContent = '✅ Token 已保存（仅本次会话有效）';
+                document.getElementById('tokenStatus').className = 'status-msg success';
+            } else {
+                document.getElementById('tokenStatus').textContent = '';
+                document.getElementById('tokenStatus').className = 'status-msg';
+            }
+        });
+
+        // ===== 获取文章列表 =====
         async function fetchPosts() {
             try {
                 const res = await fetch(API_URL);
@@ -57,17 +127,13 @@
                     return;
                 }
 
-                // 按文件名倒序排列（文件名包含日期）
                 posts.sort((a, b) => b.name.localeCompare(a.name));
 
                 let html = '';
                 for (const post of posts) {
-                    // 提取文件名中的日期和标题（去掉 .md 后缀）
                     const name = post.name.replace('.md', '');
-                    // 从文件内容获取标题（需要额外请求内容）
                     const contentRes = await fetch(post.download_url);
                     const contentText = await contentRes.text();
-                    // 提取 frontmatter 中的 title
                     const titleMatch = contentText.match(/title:\s*(.+)/);
                     const dateMatch = contentText.match(/date:\s*(.+)/);
                     const tagsMatch = contentText.match(/tags:\s*(.+)/);
@@ -76,14 +142,19 @@
                     const tags = tagsMatch ? tagsMatch[1].split(',').map(t => t.trim()) : [];
 
                     html += `
-                        <li class="post-item">
-                            <a href="post.html?file=${encodeURIComponent(post.name)}">
-                                <div class="title">${title}</div>
-                                <div class="meta">
-                                    ${date}
-                                    ${tags.map(t => `<span class="tags">#${t}</span>`).join('')}
-                                </div>
-                            </a>
+                        <li class="post-item" data-filename="${post.name}" data-sha="${post.sha}">
+                            <div class="left">
+                                <a href="post.html?file=${encodeURIComponent(post.name)}">
+                                    <div class="title">${title}</div>
+                                    <div class="meta">
+                                        ${date}
+                                        ${tags.map(t => `<span class="tags">#${t}</span>`).join('')}
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="right">
+                                <button class="delete-btn" onclick="deletePost(this)" title="删除这篇文章">🗑️</button>
+                            </div>
                         </li>
                     `;
                 }
@@ -93,7 +164,67 @@
             }
         }
 
+        // ===== 删除文章 =====
+        async function deletePost(btn) {
+            const li = btn.closest('.post-item');
+            const filename = li.dataset.filename;
+            const sha = li.dataset.sha;
+
+            // 检查 Token
+            if (!token) {
+                alert('⚠️ 请先输入 GitHub Token（点击页面上的 "输入 Token" 按钮）');
+                document.getElementById('tokenArea').classList.add('show');
+                document.getElementById('tokenInput').focus();
+                return;
+            }
+
+            // 确认删除
+            if (!confirm(`确定要删除「${filename}」吗？此操作不可撤销！`)) return;
+
+            btn.disabled = true;
+            btn.textContent = '⏳';
+
+            try {
+                const url = `https://api.github.com/repos/${REPO}/contents/${POSTS_PATH}/${filename}`;
+                const res = await fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `删除文章: ${filename}`,
+                        sha: sha,
+                        branch: 'main'
+                    })
+                });
+
+                if (res.ok) {
+                    // 从 DOM 中移除
+                    li.style.opacity = '0.3';
+                    li.style.transition = 'opacity 0.3s';
+                    setTimeout(() => li.remove(), 300);
+                    // 显示成功消息
+                    const statusMsg = document.createElement('div');
+                    statusMsg.className = 'status-msg success';
+                    statusMsg.textContent = `✅ 已删除「${filename}」`;
+                    document.getElementById('post-list').prepend(statusMsg);
+                    setTimeout(() => statusMsg.remove(), 3000);
+                } else {
+                    const err = await res.json();
+                    alert(`❌ 删除失败：${err.message || '未知错误'}`);
+                    btn.disabled = false;
+                    btn.textContent = '🗑️';
+                }
+            } catch (err) {
+                alert(`❌ 网络错误：${err.message}`);
+                btn.disabled = false;
+                btn.textContent = '🗑️';
+            }
+        }
+
+        // ===== 加载文章 =====
         fetchPosts();
     </script>
 </body>
-</html>,
+</html>
