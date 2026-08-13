@@ -42,6 +42,16 @@
         .upload-status { font-size: 13px; color: #888; margin-top: 6px; }
         .upload-status .success { color: #28a745; }
         .upload-status .error { color: #d14a4a; }
+        .token-status { font-size: 13px; margin-top: 6px; }
+        .token-status.success { color: #28a745; }
+        .token-status.error { color: #d14a4a; }
+        .token-status .forget-link { color: #888; cursor: pointer; text-decoration: underline; margin-left: 10px; }
+        .token-status .forget-link:hover { color: #d14a4a; }
+
+        /* Token 区域内联 */
+        .token-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .token-row input { flex: 1; min-width: 200px; }
+        .token-row .token-status { margin: 0; }
     </style>
 </head>
 <body>
@@ -68,8 +78,12 @@
     </div>
     <div id="uploadStatus" class="upload-status">等待上传...</div>
 
-    <label>GitHub Token</label>
-    <input type="password" class="token-input" id="token" placeholder="ghp_xxxxx（输入你的 Token）">
+    <!-- ===== Token 区域（自动加载保存的 Token） ===== -->
+    <label>🔑 GitHub Token</label>
+    <div class="token-row">
+        <input type="password" class="token-input" id="tokenInput" placeholder="ghp_xxxxx（输入后自动保存）">
+        <span id="tokenStatus" class="token-status"></span>
+    </div>
 
     <button id="publish">🚀 发布文章</button>
     <div id="status" class="status"></div>
@@ -77,8 +91,62 @@
 
     <script>
         const REPO = 'xiaociwei01/CiweiBlog';
-        const TOKEN_INPUT = document.getElementById('token');
-        const BODY = document.getElementById('body');
+        const STORAGE_KEY = 'ciwei_blog_token';
+
+        // ===== Token 管理 =====
+        let token = '';
+
+        function loadSavedToken() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                token = saved;
+                document.getElementById('tokenInput').value = saved;
+                document.getElementById('tokenStatus').innerHTML = `
+                    ✅ 已加载
+                    <span class="forget-link" onclick="forgetToken()">忘记</span>
+                `;
+                document.getElementById('tokenStatus').className = 'token-status success';
+                return true;
+            }
+            return false;
+        }
+
+        function saveToken(t) {
+            if (t && t.startsWith('ghp_')) {
+                localStorage.setItem(STORAGE_KEY, t);
+                token = t;
+                document.getElementById('tokenStatus').innerHTML = `
+                    ✅ 已保存
+                    <span class="forget-link" onclick="forgetToken()">忘记</span>
+                `;
+                document.getElementById('tokenStatus').className = 'token-status success';
+                return true;
+            } else if (!t) {
+                forgetToken();
+                return false;
+            } else {
+                document.getElementById('tokenStatus').textContent = '⚠️ 格式错误，应以 ghp_ 开头';
+                document.getElementById('tokenStatus').className = 'token-status error';
+                return false;
+            }
+        }
+
+        function forgetToken() {
+            localStorage.removeItem(STORAGE_KEY);
+            token = '';
+            document.getElementById('tokenInput').value = '';
+            document.getElementById('tokenStatus').textContent = '已清除';
+            document.getElementById('tokenStatus').className = 'token-status';
+        }
+
+        document.getElementById('tokenInput').addEventListener('input', function() {
+            const val = this.value.trim();
+            if (val) {
+                saveToken(val);
+            } else {
+                forgetToken();
+            }
+        });
 
         // ===== 日期默认今天 =====
         document.getElementById('date').value = new Date().toISOString().slice(0,10);
@@ -90,7 +158,6 @@
 
         uploadArea.addEventListener('click', () => fileInput.click());
 
-        // 拖拽支持
         uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
             uploadArea.style.borderColor = '#1a1a2e';
@@ -114,14 +181,15 @@
         });
 
         async function handleFiles(files) {
-            const token = TOKEN_INPUT.value.trim();
-            if (!token) {
-                uploadStatus.innerHTML = '<span class="error">⚠️ 请先填写 GitHub Token</span>';
+            // 自动使用保存的 Token
+            let currentToken = token || localStorage.getItem(STORAGE_KEY);
+            if (!currentToken) {
+                uploadStatus.innerHTML = '<span class="error">⚠️ 请先输入 GitHub Token</span>';
+                document.getElementById('tokenInput').focus();
                 return;
             }
 
             for (const file of files) {
-                // 检查文件大小（GitHub API 限制单个文件 < 100MB）
                 if (file.size > 100 * 1024 * 1024) {
                     uploadStatus.innerHTML = `<span class="error">❌ ${file.name} 超过 100MB，无法上传</span>`;
                     continue;
@@ -130,9 +198,7 @@
                 uploadStatus.innerHTML = `⏳ 上传 ${file.name} ...`;
 
                 try {
-                    // 读取文件为 base64
                     const base64 = await readFileAsBase64(file);
-                    // 生成路径：images/年/月/文件名
                     const date = new Date();
                     const year = date.getFullYear();
                     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -142,38 +208,34 @@
                     const filename = `${year}/${month}/${safeName}-${Date.now()}.${ext}`;
                     const path = `images/${filename}`;
 
-                    // 调用 GitHub API 上传
                     const url = `https://api.github.com/repos/${REPO}/contents/${path}`;
                     const payload = {
                         message: `上传文件: ${file.name}`,
-                        content: base64.split(',')[1], // 去掉 data:image/...;base64, 前缀
+                        content: base64.split(',')[1],
                         branch: 'main'
                     };
 
                     const res = await fetch(url, {
                         method: 'PUT',
                         headers: {
-                            'Authorization': `token ${token}`,
+                            'Authorization': `token ${currentToken}`,
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify(payload)
                     });
 
                     if (res.ok) {
-                        // 生成 raw 链接
                         const rawUrl = `https://raw.githubusercontent.com/${REPO}/main/${path}`;
-                        // 判断是图片还是视频
                         const isVideo = file.type.startsWith('video/');
                         const markdown = isVideo
                             ? `<video controls src="${rawUrl}" style="max-width:100%;border-radius:8px;"></video>`
                             : `![](${rawUrl})`;
-                        // 插入到正文光标位置或末尾
-                        const cursorPos = BODY.selectionStart || BODY.value.length;
-                        const before = BODY.value.substring(0, cursorPos);
-                        const after = BODY.value.substring(cursorPos);
-                        BODY.value = before + markdown + '\n\n' + after;
-                        // 触发 input 事件
-                        BODY.dispatchEvent(new Event('input'));
+                        const cursorPos = document.getElementById('body').selectionStart || document.getElementById('body').value.length;
+                        const body = document.getElementById('body');
+                        const before = body.value.substring(0, cursorPos);
+                        const after = body.value.substring(cursorPos);
+                        body.value = before + markdown + '\n\n' + after;
+                        body.dispatchEvent(new Event('input'));
 
                         uploadStatus.innerHTML = `<span class="success">✅ ${file.name} 上传成功，已插入正文</span>`;
                     } else {
@@ -186,7 +248,6 @@
             }
         }
 
-        // 工具：读取文件为 base64
         function readFileAsBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -202,10 +263,17 @@
             const date = document.getElementById('date').value;
             const tags = document.getElementById('tags').value.trim();
             const body = document.getElementById('body').value.trim();
-            const token = TOKEN_INPUT.value.trim();
 
-            if (!title || !body || !token) {
-                document.getElementById('status').textContent = '⚠️ 标题、正文和 Token 都不能为空';
+            // 自动使用保存的 Token
+            let currentToken = token || localStorage.getItem(STORAGE_KEY);
+            if (!currentToken) {
+                document.getElementById('status').textContent = '⚠️ 请先输入 GitHub Token';
+                document.getElementById('tokenInput').focus();
+                return;
+            }
+
+            if (!title || !body) {
+                document.getElementById('status').textContent = '⚠️ 标题和正文不能为空';
                 return;
             }
 
@@ -225,7 +293,7 @@ ${body}`;
                 let sha = '';
                 try {
                     const checkRes = await fetch(url, {
-                        headers: { 'Authorization': `token ${token}` }
+                        headers: { 'Authorization': `token ${currentToken}` }
                     });
                     if (checkRes.ok) {
                         const data = await checkRes.json();
@@ -243,7 +311,7 @@ ${body}`;
                 const res = await fetch(url, {
                     method: 'PUT',
                     headers: {
-                        'Authorization': `token ${token}`,
+                        'Authorization': `token ${currentToken}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(payload)
@@ -260,6 +328,9 @@ ${body}`;
                 document.getElementById('status').textContent = '❌ 网络错误：' + err.message;
             }
         });
+
+        // ===== 初始化 =====
+        loadSavedToken();
     </script>
 </body>
 </html>
