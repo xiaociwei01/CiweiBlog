@@ -51,7 +51,6 @@
         .token-row input { flex: 1; min-width: 200px; }
         .token-row .token-status { margin: 0; }
 
-        /* 发布时间提示 */
         .time-hint {
             font-size: 14px;
             color: #888;
@@ -73,7 +72,6 @@
     <label>标题</label>
     <input type="text" id="title" placeholder="文章标题">
 
-    <!-- ===== 自动记录发布时间（不再需要手动选择） ===== -->
     <label>📅 发布时间</label>
     <div class="time-hint" id="timeHint">
         ⏱️ 将自动记录为：<strong id="timeDisplay">加载中...</strong>
@@ -85,7 +83,6 @@
     <label>正文（Markdown 格式）</label>
     <textarea id="body" placeholder="写点什么..."></textarea>
 
-    <!-- ===== 上传区域 ===== -->
     <label>📎 上传图片或视频（自动插入正文）</label>
     <div class="upload-area" id="uploadArea">
         <div>点击选择文件 或 拖拽到这里</div>
@@ -94,7 +91,6 @@
     </div>
     <div id="uploadStatus" class="upload-status">等待上传...</div>
 
-    <!-- ===== Token 区域 ===== -->
     <label>🔑 GitHub Token</label>
     <div class="token-row">
         <input type="password" class="token-input" id="tokenInput" placeholder="ghp_xxxxx（输入后自动保存）">
@@ -109,7 +105,6 @@
         const REPO = 'xiaociwei01/CiweiBlog';
         const STORAGE_KEY = 'ciwei_blog_token';
 
-        // ===== 获取当前时间（精确到分钟） =====
         function getCurrentTime() {
             const now = new Date();
             const year = now.getFullYear();
@@ -125,16 +120,13 @@
             };
         }
 
-        // ===== 更新发布时间显示 =====
         function updateTimeDisplay() {
             const time = getCurrentTime();
             document.getElementById('timeDisplay').textContent = time.fullStr;
         }
         updateTimeDisplay();
-        // 每分钟更新一次显示
         setInterval(updateTimeDisplay, 60000);
 
-        // ===== Token 管理 =====
         let token = '';
 
         function loadSavedToken() {
@@ -189,7 +181,6 @@
             }
         });
 
-        // ===== 上传文件 =====
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
         const uploadStatus = document.getElementById('uploadStatus');
@@ -294,7 +285,6 @@
             });
         }
 
-        // ===== 发布文章 =====
         document.getElementById('publish').addEventListener('click', async function() {
             const title = document.getElementById('title').value.trim();
             const tags = document.getElementById('tags').value.trim();
@@ -312,18 +302,15 @@
                 return;
             }
 
-            // ===== 自动获取当前时间（精确到分钟） =====
             const time = getCurrentTime();
             const dateStr = time.dateStr;
             const timeStr = time.timeStr;
             const fullStr = time.fullStr;
             const filenamePrefix = time.filenamePrefix;
 
-            // 文件名：日期-时分-标题.md（确保唯一性）
             const slug = title.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '-');
             const filename = `${filenamePrefix}-${slug}.md`;
 
-            // 内容中写入精确到分钟的发布时间
             const content = `---
 title: ${title}
 date: ${fullStr}
@@ -374,7 +361,6 @@ ${body}`;
             }
         });
 
-        // ===== 初始化 =====
         loadSavedToken();
     </script>
 </body>

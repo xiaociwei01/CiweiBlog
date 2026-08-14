@@ -16,7 +16,6 @@
             margin: 0 auto;
         }
 
-        /* ===== 顶部导航 ===== */
         .nav-bar {
             display: flex;
             align-items: center;
@@ -61,7 +60,6 @@
             margin-top: 2px;
         }
 
-        /* ===== 文章详情 ===== */
         .detail-container {
             background: #ffffff;
             border-radius: 16px;
@@ -70,7 +68,6 @@
             border: 1px solid #f0f0f0;
         }
 
-        /* 头部 */
         .detail-header {
             display: flex;
             align-items: center;
@@ -111,7 +108,6 @@
             margin-top: 1px;
         }
 
-        /* 标题 */
         .detail-title {
             font-size: 22px;
             font-weight: 700;
@@ -120,7 +116,6 @@
             line-height: 1.4;
         }
 
-        /* 正文 */
         .detail-body {
             font-size: 16px;
             line-height: 1.8;
@@ -134,7 +129,6 @@
             display: none;
         }
 
-        /* ===== 图片网格（和朋友圈列表页一致） ===== */
         .detail-images {
             display: grid;
             gap: 4px;
@@ -203,7 +197,6 @@
             transform: scale(1.02);
         }
 
-        /* ===== 视频网格 ===== */
         .detail-videos {
             display: grid;
             gap: 4px;
@@ -261,7 +254,6 @@
             height: 100%;
         }
 
-        /* ===== 标签 ===== */
         .detail-tags {
             margin-top: 14px;
             display: flex;
@@ -277,7 +269,6 @@
             color: #888;
         }
 
-        /* ===== 加载状态 ===== */
         .loading-state {
             text-align: center;
             padding: 60px 20px;
@@ -299,7 +290,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* ===== 错误状态 ===== */
         .error-state {
             text-align: center;
             padding: 60px 20px;
@@ -311,7 +301,6 @@
             margin-bottom: 12px;
         }
 
-        /* ===== 图片查看模态框 ===== */
         .img-modal {
             display: none;
             position: fixed;
@@ -350,7 +339,6 @@
             pointer-events: none;
         }
 
-        /* ===== 响应式 ===== */
         @media (max-width: 480px) {
             .detail-container {
                 padding: 16px 14px 18px;
@@ -430,7 +418,6 @@
 </head>
 <body>
 
-    <!-- ====== 顶部导航 ====== -->
     <nav class="nav-bar">
         <a class="back-link" href="FriendQuan.html">← 返回</a>
         <div class="nav-title">
@@ -439,7 +426,6 @@
         </div>
     </nav>
 
-    <!-- ====== 文章内容 ====== -->
     <div id="detailContent" class="detail-container">
         <div class="loading-state">
             <div class="spinner"></div>
@@ -447,24 +433,17 @@
         </div>
     </div>
 
-    <!-- ====== 图片查看模态框 ====== -->
     <div class="img-modal" id="imgModal" onclick="closeImgModal()">
         <img id="modalImg" src="" alt="查看大图">
         <div class="close-hint">点击任意处关闭</div>
     </div>
 
     <script>
-        // ================================================================
-        // 配置
-        // ================================================================
         const BLOG_REPO = 'xiaociwei01/CiweiBlog';
         const AVATAR_URL = 'https://xiaociwei01.github.io/CiweiHome/ciweitouxiang.jpg';
         const NICKNAME = '小刺猬';
         const LIST_PAGE = 'FriendQuan.html';
 
-        // ================================================================
-        // 工具函数：构建 raw 地址
-        // ================================================================
         function buildRawUrl(path) {
             if (path.startsWith('http://') || path.startsWith('https://')) {
                 return path;
@@ -473,17 +452,11 @@
             return `https://raw.githubusercontent.com/${BLOG_REPO}/main/${clean}`;
         }
 
-        // ================================================================
-        // 获取 URL 参数
-        // ================================================================
         function getUrlParam(name) {
             const params = new URLSearchParams(window.location.search);
             return params.get(name);
         }
 
-        // ================================================================
-        // 渲染图片网格（和 FriendQuan.html 一致）
-        // ================================================================
         function renderImages(images) {
             if (!images || images.length === 0) return '';
 
@@ -509,9 +482,6 @@
             `;
         }
 
-        // ================================================================
-        // 渲染视频网格（和 FriendQuan.html 一致）
-        // ================================================================
         function renderVideos(videos) {
             if (!videos || videos.length === 0) return '';
 
@@ -537,9 +507,6 @@
             `;
         }
 
-        // ================================================================
-        // 加载并渲染文章
-        // ================================================================
         async function loadPost() {
             const container = document.getElementById('detailContent');
             const sub = document.getElementById('detailSub');
@@ -563,7 +530,6 @@
 
                 const contentText = await res.text();
 
-                // 解析 frontmatter
                 const lines = contentText.split('\n');
                 let title = filename.replace('.md', '');
                 let date = '未知日期';
@@ -585,7 +551,6 @@
 
                 const body = lines.slice(bodyStart).join('\n').trim();
 
-                // 提取所有图片
                 const images = [];
                 const imgRegex = /!\[.*?\]\((.*?)\)/g;
                 let imgMatch;
@@ -593,7 +558,6 @@
                     images.push(imgMatch[1]);
                 }
 
-                // 提取所有视频
                 const videos = [];
                 const vidRegex = /<video[^>]*src="([^"]*)"[^>]*>/g;
                 let vidMatch;
@@ -601,7 +565,6 @@
                     videos.push(vidMatch[1]);
                 }
 
-                // 纯文本（去除图片和视频标记）
                 let textBody = body;
                 textBody = textBody.replace(/!\[.*?\]\(.*?\)/g, '');
                 textBody = textBody.replace(/<video[^>]*>.*?<\/video>/g, '');
@@ -615,7 +578,6 @@
                     `<div class="detail-tags">${tagsArray.map(t => `<span class="tag">#${t}</span>`).join('')}</div>` :
                     '';
 
-                // 更新顶部副标题
                 sub.textContent = date;
 
                 container.innerHTML = `
@@ -647,9 +609,6 @@
             }
         }
 
-        // ================================================================
-        // 图片查看
-        // ================================================================
         function openImgModal(src) {
             const modal = document.getElementById('imgModal');
             const img = document.getElementById('modalImg');
@@ -670,9 +629,6 @@
             }
         });
 
-        // ================================================================
-        // 启动
-        // ================================================================
         loadPost();
     </script>
 
