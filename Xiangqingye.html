@@ -19,36 +19,15 @@
         .nav-bar {
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: center;
             padding: 8px 0 16px;
             border-bottom: 1px solid #eee;
             margin-bottom: 20px;
         }
 
-        .nav-bar .back-link {
-            color: #1a1a2e;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            background: #f0f0f0;
-            transition: background 0.2s;
-            flex-shrink: 0;
-        }
-
-        .nav-bar .back-link:hover {
-            background: #e0e0e0;
-        }
-
         .nav-bar .nav-title {
             font-size: 18px;
             font-weight: 700;
-            flex: 1;
-            text-align: center;
             color: #1a1a2e;
         }
 
@@ -376,11 +355,6 @@
             .nav-bar .nav-title {
                 font-size: 16px;
             }
-
-            .nav-bar .back-link {
-                font-size: 13px;
-                padding: 4px 10px;
-            }
         }
 
         @media (min-width: 641px) {
@@ -419,7 +393,6 @@
 <body>
 
     <nav class="nav-bar">
-        <a class="back-link" href="FriendQuan.html">← 返回</a>
         <div class="nav-title">
             📄 文章详情
             <span class="sub" id="detailSub">加载中...</span>
@@ -442,7 +415,6 @@
         const BLOG_REPO = 'xiaociwei01/CiweiBlog';
         const AVATAR_URL = 'https://xiaociwei01.github.io/CiweiHome/ciweitouxiang.jpg';
         const NICKNAME = '小刺猬';
-        const LIST_PAGE = 'FriendQuan.html';
 
         function buildRawUrl(path) {
             if (path.startsWith('http://') || path.startsWith('https://')) {
