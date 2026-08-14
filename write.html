@@ -26,7 +26,6 @@
         .back:hover { color: #1a1a2e; }
         .token-input { background: #f5f5f5; border: 1px solid #eee; padding: 6px 10px; border-radius: 6px; font-size: 13px; color: #555; width: 100%; }
 
-        /* 上传区域 */
         .upload-area {
             border: 2px dashed #ddd;
             border-radius: 12px;
@@ -48,10 +47,24 @@
         .token-status .forget-link { color: #888; cursor: pointer; text-decoration: underline; margin-left: 10px; }
         .token-status .forget-link:hover { color: #d14a4a; }
 
-        /* Token 区域内联 */
         .token-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
         .token-row input { flex: 1; min-width: 200px; }
         .token-row .token-status { margin: 0; }
+
+        /* 发布时间提示 */
+        .time-hint {
+            font-size: 14px;
+            color: #888;
+            background: #f5f6f8;
+            padding: 8px 14px;
+            border-radius: 8px;
+            margin-top: 4px;
+            border: 1px solid #eee;
+        }
+        .time-hint strong {
+            color: #1a1a2e;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -60,8 +73,11 @@
     <label>标题</label>
     <input type="text" id="title" placeholder="文章标题">
 
-    <label>日期</label>
-    <input type="date" id="date">
+    <!-- ===== 自动记录发布时间（不再需要手动选择） ===== -->
+    <label>📅 发布时间</label>
+    <div class="time-hint" id="timeHint">
+        ⏱️ 将自动记录为：<strong id="timeDisplay">加载中...</strong>
+    </div>
 
     <label>标签（用逗号分隔）</label>
     <input type="text" id="tags" placeholder="日记, 生活">
@@ -78,7 +94,7 @@
     </div>
     <div id="uploadStatus" class="upload-status">等待上传...</div>
 
-    <!-- ===== Token 区域（自动加载保存的 Token） ===== -->
+    <!-- ===== Token 区域 ===== -->
     <label>🔑 GitHub Token</label>
     <div class="token-row">
         <input type="password" class="token-input" id="tokenInput" placeholder="ghp_xxxxx（输入后自动保存）">
@@ -92,6 +108,31 @@
     <script>
         const REPO = 'xiaociwei01/CiweiBlog';
         const STORAGE_KEY = 'ciwei_blog_token';
+
+        // ===== 获取当前时间（精确到分钟） =====
+        function getCurrentTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            return {
+                dateStr: `${year}-${month}-${day}`,
+                timeStr: `${hours}:${minutes}`,
+                fullStr: `${year}-${month}-${day} ${hours}:${minutes}`,
+                filenamePrefix: `${year}-${month}-${day}-${hours}${minutes}`
+            };
+        }
+
+        // ===== 更新发布时间显示 =====
+        function updateTimeDisplay() {
+            const time = getCurrentTime();
+            document.getElementById('timeDisplay').textContent = time.fullStr;
+        }
+        updateTimeDisplay();
+        // 每分钟更新一次显示
+        setInterval(updateTimeDisplay, 60000);
 
         // ===== Token 管理 =====
         let token = '';
@@ -148,9 +189,6 @@
             }
         });
 
-        // ===== 日期默认今天 =====
-        document.getElementById('date').value = new Date().toISOString().slice(0,10);
-
         // ===== 上传文件 =====
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
@@ -181,7 +219,6 @@
         });
 
         async function handleFiles(files) {
-            // 自动使用保存的 Token
             let currentToken = token || localStorage.getItem(STORAGE_KEY);
             if (!currentToken) {
                 uploadStatus.innerHTML = '<span class="error">⚠️ 请先输入 GitHub Token</span>';
@@ -199,9 +236,9 @@
 
                 try {
                     const base64 = await readFileAsBase64(file);
-                    const date = new Date();
-                    const year = date.getFullYear();
-                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const now = new Date();
+                    const year = now.getFullYear();
+                    const month = String(now.getMonth() + 1).padStart(2, '0');
                     const ext = file.name.split('.').pop();
                     const baseName = file.name.replace(/\.[^.]+$/, '');
                     const safeName = baseName.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '-');
@@ -260,11 +297,9 @@
         // ===== 发布文章 =====
         document.getElementById('publish').addEventListener('click', async function() {
             const title = document.getElementById('title').value.trim();
-            const date = document.getElementById('date').value;
             const tags = document.getElementById('tags').value.trim();
             const body = document.getElementById('body').value.trim();
 
-            // 自动使用保存的 Token
             let currentToken = token || localStorage.getItem(STORAGE_KEY);
             if (!currentToken) {
                 document.getElementById('status').textContent = '⚠️ 请先输入 GitHub Token';
@@ -277,11 +312,21 @@
                 return;
             }
 
+            // ===== 自动获取当前时间（精确到分钟） =====
+            const time = getCurrentTime();
+            const dateStr = time.dateStr;
+            const timeStr = time.timeStr;
+            const fullStr = time.fullStr;
+            const filenamePrefix = time.filenamePrefix;
+
+            // 文件名：日期-时分-标题.md（确保唯一性）
             const slug = title.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '-');
-            const filename = `${date}-${slug}.md`;
+            const filename = `${filenamePrefix}-${slug}.md`;
+
+            // 内容中写入精确到分钟的发布时间
             const content = `---
 title: ${title}
-date: ${date}
+date: ${fullStr}
 tags: ${tags}
 ---
 
@@ -318,7 +363,7 @@ ${body}`;
                 });
 
                 if (res.ok) {
-                    document.getElementById('status').innerHTML = '✅ 发布成功！<a href="index.html">点击返回首页查看</a>';
+                    document.getElementById('status').innerHTML = `✅ 发布成功！发布时间：${fullStr} <a href="index.html">点击返回首页查看</a>`;
                     document.getElementById('publish').disabled = true;
                 } else {
                     const err = await res.json();
