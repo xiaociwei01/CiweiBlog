@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>文章管理 · 后台（优化版）</title>
+    <title>文章管理 · 后台</title>
     <style>
-        /* ========== 样式保持原样，未做改动 ========== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             font-family: -apple-system, 'PingFang SC', 'Segoe UI', Roboto, sans-serif;
             background: #f0f2f5;
@@ -17,12 +15,7 @@
             display: flex;
             justify-content: center;
         }
-
-        .container {
-            max-width: 820px;
-            width: 100%;
-        }
-
+        .container { max-width: 820px; width: 100%; }
         .nav-bar {
             display: flex;
             align-items: center;
@@ -33,62 +26,36 @@
             flex-wrap: wrap;
             gap: 8px;
         }
-
-        .nav-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .nav-left .logo {
-            font-size: 22px;
-            font-weight: 700;
-            color: #1a1a2e;
-        }
-
+        .nav-left { display: flex; align-items: center; gap: 12px; }
+        .nav-left .logo { font-size: 22px; font-weight: 700; }
         .nav-left .badge {
             background: #e8ecf0;
             font-size: 11px;
             color: #888;
             padding: 2px 10px;
             border-radius: 12px;
-            font-weight: 500;
         }
-
-        .nav-right {
+        .token-status-bar {
             display: flex;
             align-items: center;
             gap: 8px;
-        }
-
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .stat-card {
-            background: #ffffff;
-            border-radius: 14px;
-            padding: 14px 18px;
+            font-size: 13px;
+            color: #888;
+            background: #f5f6f8;
+            padding: 6px 16px;
+            border-radius: 30px;
             border: 1px solid #e8ecf0;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            cursor: pointer;
+            user-select: none;
         }
-
-        .stat-card .num {
-            font-size: 24px;
-            font-weight: 700;
-            color: #1a1a2e;
-            line-height: 1.2;
+        .token-status-bar .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
         }
-
-        .stat-card .label {
-            font-size: 12px;
-            color: #999;
-            margin-top: 2px;
-        }
-
+        .token-status-bar .dot.active { background: #22c55e; }
+        .token-status-bar .dot.inactive { background: #d0d5dd; }
         .action-bar {
             display: flex;
             flex-wrap: wrap;
@@ -97,13 +64,7 @@
             gap: 12px;
             margin-bottom: 20px;
         }
-
-        .action-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
+        .action-left { display: flex; align-items: center; gap: 10px; }
         .btn {
             display: inline-flex;
             align-items: center;
@@ -114,179 +75,15 @@
             font-weight: 500;
             border: none;
             cursor: pointer;
-            transition: all 0.2s ease;
             text-decoration: none;
-            touch-action: manipulation;
-        }
-
-        .btn-primary {
-            background: #1a1a2e;
-            color: #fff;
-        }
-
-        .btn-primary:hover {
-            background: #2d2d4a;
-            transform: scale(0.97);
-        }
-
-        .btn-primary:active {
-            transform: scale(0.93);
-        }
-
-        .btn-outline {
-            background: #ffffff;
-            color: #1a1a2e;
-            border: 1px solid #d0d5dd;
-        }
-
-        .btn-outline:hover {
-            background: #f5f6f8;
-            border-color: #b0b8c4;
-        }
-
-        .btn-outline:active {
-            transform: scale(0.96);
-        }
-
-        .btn-sm {
-            padding: 6px 16px;
-            font-size: 13px;
-        }
-
-        .token-status-bar {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13px;
-            color: #888;
-            background: #f5f6f8;
-            padding: 6px 16px 6px 14px;
-            border-radius: 30px;
-            border: 1px solid #e8ecf0;
-            cursor: pointer;
             transition: all 0.2s;
-            user-select: none;
         }
-
-        .token-status-bar:hover {
-            background: #eef0f3;
-        }
-
-        .token-status-bar .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-            flex-shrink: 0;
-        }
-
-        .token-status-bar .dot.active {
-            background: #22c55e;
-        }
-
-        .token-status-bar .dot.inactive {
-            background: #d0d5dd;
-        }
-
-        .token-status-bar .label {
-            font-weight: 500;
-            color: #555;
-        }
-
-        .token-status-bar .arrow {
-            font-size: 10px;
-            color: #bbb;
-            transition: transform 0.2s;
-        }
-
-        .token-status-bar:hover .arrow {
-            transform: translateX(2px);
-        }
-
-        .token-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            backdrop-filter: blur(4px);
-        }
-
-        .token-modal.active {
-            display: flex;
-        }
-
-        .token-modal .modal-box {
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 28px 28px 24px;
-            max-width: 420px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-            animation: scaleIn 0.25s ease;
-        }
-
-        @keyframes scaleIn {
-            from { transform: scale(0.92); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        .token-modal .modal-box .title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .token-modal .modal-box .desc {
-            font-size: 13px;
-            color: #888;
-            margin-bottom: 16px;
-        }
-
-        .token-modal .modal-box input {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid #d0d5dd;
-            border-radius: 10px;
-            font-size: 14px;
-            font-family: inherit;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .token-modal .modal-box input:focus {
-            border-color: #1a1a2e;
-        }
-
-        .token-modal .modal-box .hint {
-            font-size: 12px;
-            color: #aaa;
-            margin-top: 6px;
-        }
-
-        .token-modal .modal-box .actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 16px;
-            justify-content: flex-end;
-        }
-
-        .token-modal .modal-box .actions .btn {
-            padding: 8px 24px;
-        }
-
-        .post-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
+        .btn-primary { background: #1a1a2e; color: #fff; }
+        .btn-primary:hover { background: #2d2d4a; }
+        .btn-outline { background: #fff; color: #1a1a2e; border: 1px solid #d0d5dd; }
+        .btn-outline:hover { background: #f5f6f8; }
+        .btn-sm { padding: 6px 16px; font-size: 13px; }
+        .post-list { display: flex; flex-direction: column; gap: 10px; }
         .post-item {
             background: #ffffff;
             border-radius: 14px;
@@ -295,58 +92,33 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            transition: all 0.2s;
         }
-
         .post-item:hover {
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
             border-color: #d5dbe3;
         }
-
         .post-item.deleting {
             opacity: 0;
             transform: scale(0.95);
-            transition: all 0.25s ease;
+            transition: all 0.25s;
         }
-
-        .post-item .left {
-            flex: 1;
-            min-width: 0;
-            cursor: pointer;
-        }
-
+        .post-item .left { flex: 1; min-width: 0; cursor: pointer; }
         .post-item .left .title {
             font-size: 15px;
             font-weight: 600;
             color: #1a1a2e;
             display: block;
             text-decoration: none;
-            transition: color 0.2s;
         }
-
-        .post-item .left .title:hover {
-            color: #000;
-        }
-
         .post-item .left .meta {
             font-size: 12px;
             color: #bbb;
             margin-top: 2px;
             display: flex;
-            align-items: center;
             gap: 12px;
             flex-wrap: wrap;
         }
-
-        .post-item .left .meta .tag {
-            background: #f0f2f5;
-            padding: 0 8px;
-            border-radius: 10px;
-            font-size: 11px;
-            color: #888;
-        }
-
         .post-item .right {
             display: flex;
             align-items: center;
@@ -354,7 +126,6 @@
             flex-shrink: 0;
             margin-left: 12px;
         }
-
         .post-item .right .btn-icon {
             background: none;
             border: none;
@@ -369,21 +140,8 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-
-        .post-item .right .btn-icon:hover {
-            background: #f5f5f5;
-            color: #dc2626;
-        }
-
-        .post-item .right .btn-icon:active {
-            transform: scale(0.9);
-        }
-
-        .post-item .right .btn-icon:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-
+        .post-item .right .btn-icon:hover { background: #f5f5f5; color: #dc2626; }
+        .post-item .right .btn-icon:disabled { opacity: 0.3; cursor: not-allowed; }
         .post-item .right .view-link {
             background: none;
             border: none;
@@ -396,47 +154,17 @@
             font-size: 15px;
             color: #bbb;
             cursor: pointer;
-            transition: all 0.2s;
             text-decoration: none;
         }
-
-        .post-item .right .view-link:hover {
-            background: #f0f2f5;
-            color: #555;
-        }
-
-        .empty-state {
+        .post-item .right .view-link:hover { background: #f0f2f5; color: #555; }
+        .empty-state, .loading-state, .error-state {
             text-align: center;
             padding: 60px 20px;
             background: #ffffff;
             border-radius: 14px;
             border: 1px solid #e8ecf0;
-        }
-
-        .empty-state .icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-        }
-
-        .empty-state .text {
-            font-size: 16px;
             color: #888;
         }
-
-        .empty-state .sub {
-            font-size: 13px;
-            color: #bbb;
-            margin-top: 4px;
-        }
-
-        .loading-state {
-            text-align: center;
-            padding: 60px 20px;
-            background: #ffffff;
-            border-radius: 14px;
-            border: 1px solid #e8ecf0;
-        }
-
         .loading-state .spinner {
             display: inline-block;
             width: 28px;
@@ -447,16 +175,7 @@
             animation: spin 0.8s linear infinite;
             margin-bottom: 12px;
         }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-state .text {
-            font-size: 14px;
-            color: #ccc;
-        }
-
+        @keyframes spin { to { transform: rotate(360deg); } }
         .toast {
             position: fixed;
             bottom: 30px;
@@ -467,48 +186,72 @@
             padding: 12px 24px;
             border-radius: 40px;
             font-size: 14px;
-            font-weight: 500;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
             opacity: 0;
-            transition: all 0.35s ease;
+            transition: all 0.35s;
             pointer-events: none;
             z-index: 1000;
         }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast.error { background: #dc2626; }
+        .token-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
-
-        .toast.success {
-            background: #1a1a2e;
+        .token-modal.active { display: flex; }
+        .token-modal .modal-box {
+            background: #fff;
+            border-radius: 20px;
+            padding: 28px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
         }
-
-        .toast.error {
-            background: #dc2626;
+        .token-modal .modal-box .title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
         }
-
+        .token-modal .modal-box .desc {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 16px;
+        }
+        .token-modal .modal-box input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #d0d5dd;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+        }
+        .token-modal .modal-box input:focus { border-color: #1a1a2e; }
+        .token-modal .modal-box .hint {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 6px;
+        }
+        .token-modal .modal-box .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            justify-content: flex-end;
+        }
         @media (max-width: 600px) {
-            body { padding: 14px 12px 40px; }
             .nav-bar { padding: 8px 0 12px; }
             .nav-left .logo { font-size: 19px; }
-            .nav-left .badge { font-size: 10px; padding: 1px 8px; }
-            .stats-row { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-            .stat-card { padding: 12px 14px; }
-            .stat-card .num { font-size: 20px; }
             .action-bar { flex-direction: column; align-items: stretch; }
-            .action-left { flex-wrap: wrap; }
-            .action-left .btn { flex: 1; justify-content: center; padding: 8px 16px; font-size: 13px; }
-            .token-status-bar { padding: 4px 12px 4px 10px; font-size: 12px; justify-content: center; }
-            .post-item { padding: 14px 14px; flex-wrap: wrap; }
+            .action-left .btn { flex: 1; justify-content: center; }
+            .post-item { padding: 14px; flex-wrap: wrap; }
             .post-item .right { margin-left: 0; margin-top: 8px; width: 100%; justify-content: flex-end; }
-            .post-item .left .meta { font-size: 11px; gap: 6px; }
-            .token-modal .modal-box { padding: 20px; }
-            .toast { font-size: 13px; padding: 10px 20px; width: 90%; text-align: center; }
-        }
-
-        @media (min-width: 601px) and (max-width: 820px) {
-            .stats-row { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
@@ -520,44 +263,25 @@
             <span class="logo">📂 文章管理</span>
             <span class="badge" id="postCount">0 篇</span>
         </div>
-        <div class="nav-right">
-            <div class="token-status-bar" id="tokenStatusBar" title="点击管理 Token">
-                <span class="dot inactive" id="tokenDot"></span>
-                <span class="label" id="tokenLabel">未配置</span>
-                <span class="arrow">▾</span>
-            </div>
+        <div class="token-status-bar" id="tokenStatusBar" title="点击管理 Token">
+            <span class="dot inactive" id="tokenDot"></span>
+            <span id="tokenLabel">未配置</span>
+            <span>▾</span>
         </div>
     </nav>
-
-    <div class="stats-row" id="statsRow">
-        <div class="stat-card">
-            <div class="num" id="statTotal">0</div>
-            <div class="label">总文章</div>
-        </div>
-        <div class="stat-card">
-            <div class="num" id="statToday">0</div>
-            <div class="label">今日发布</div>
-        </div>
-        <div class="stat-card">
-            <div class="num" id="statThisWeek">0</div>
-            <div class="label">本周发布</div>
-        </div>
-    </div>
 
     <div class="action-bar">
         <div class="action-left">
             <a href="write.html" class="btn btn-primary">✍️ 写新文章</a>
-            <button class="btn btn-outline btn-sm" id="refreshBtn">🔄 刷新</button>
+            <button class="btn btn-outline btn-sm" onclick="loadPosts()">🔄 刷新</button>
         </div>
-        <div>
-            <span style="font-size:12px;color:#ccc;" id="lastUpdateTime"></span>
-        </div>
+        <span style="font-size:12px;color:#ccc;" id="lastUpdateTime"></span>
     </div>
 
     <div id="postList" class="post-list">
         <div class="loading-state">
             <div class="spinner"></div>
-            <div class="text">加载中...</div>
+            <div>加载中...</div>
         </div>
     </div>
 </div>
@@ -567,36 +291,26 @@
 <div class="token-modal" id="tokenModal">
     <div class="modal-box">
         <div class="title">🔑 GitHub Token</div>
-        <div class="desc">用于删除文章和上传文件，Token 仅保存在你的浏览器中。</div>
+        <div class="desc">用于删除文章，Token 仅保存在你的浏览器中。</div>
         <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
         <div class="hint" id="tokenHint">输入后自动保存</div>
         <div class="actions">
-            <button class="btn btn-outline btn-sm" id="tokenClearBtn">清除</button>
-            <button class="btn btn-primary btn-sm" id="tokenSaveBtn">保存</button>
+            <button class="btn btn-outline btn-sm" onclick="clearToken()">清除</button>
+            <button class="btn btn-primary btn-sm" onclick="saveTokenAndClose()">保存</button>
         </div>
     </div>
 </div>
 
 <script>
-    // ================================================================
-    // 配置
-    // ================================================================
     const REPO = 'xiaociwei01/CiweiBlog';
     const POSTS_PATH = 'posts';
     const API_URL = `https://api.github.com/repos/${REPO}/contents/${POSTS_PATH}`;
     const STORAGE_KEY = 'ciwei_blog_token';
-    const CACHE_KEY = 'ciwei_blog_posts_cache'; // 文章元数据缓存 key
     const DETAIL_PAGE = 'Xiangqingye.html';
 
-    // ================================================================
-    // 状态
-    // ================================================================
     let token = '';
-    let postsData = []; // 当前渲染的文章数组（全局，供删除后更新使用）
+    let postsData = [];
 
-    // ================================================================
-    // DOM 引用
-    // ================================================================
     const $ = id => document.getElementById(id);
     const postList = $('postList');
     const toast = $('toast');
@@ -605,18 +319,8 @@
     const tokenHint = $('tokenHint');
     const tokenDot = $('tokenDot');
     const tokenLabel = $('tokenLabel');
-    const tokenStatusBar = $('tokenStatusBar');
-    const statTotal = $('statTotal');
-    const statToday = $('statToday');
-    const statThisWeek = $('statThisWeek');
-    const postCount = $('postCount');
-    const lastUpdateTime = $('lastUpdateTime');
 
-    // ================================================================
-    // Toast
-    // ================================================================
     let toastTimer = null;
-
     function showToast(msg, type = 'success') {
         toast.textContent = msg;
         toast.className = 'toast ' + type;
@@ -626,9 +330,7 @@
         toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
-    // ================================================================
-    // Token 管理（与原版相同）
-    // ================================================================
+    // ========== Token ==========
     function loadToken() {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved && saved.startsWith('ghp_')) {
@@ -637,60 +339,48 @@
             tokenDot.className = 'dot active';
             tokenLabel.textContent = '已配置';
             tokenHint.textContent = '✅ Token 已配置';
-            return true;
         } else {
             token = '';
             tokenInput.value = '';
             tokenDot.className = 'dot inactive';
             tokenLabel.textContent = '未配置';
             tokenHint.textContent = '⚠️ 请配置 Token 以删除文章';
-            return false;
         }
     }
 
-    function saveToken(t) {
-        if (t && t.startsWith('ghp_')) {
-            localStorage.setItem(STORAGE_KEY, t);
-            token = t;
+    function saveTokenAndClose() {
+        const val = tokenInput.value.trim();
+        if (val && val.startsWith('ghp_')) {
+            localStorage.setItem(STORAGE_KEY, val);
+            token = val;
             tokenDot.className = 'dot active';
             tokenLabel.textContent = '已配置';
             tokenHint.textContent = '✅ Token 已配置';
-            showToast('✅ Token 已保存', 'success');
-            return true;
-        } else if (!t) {
-            localStorage.removeItem(STORAGE_KEY);
-            token = '';
-            tokenDot.className = 'dot inactive';
-            tokenLabel.textContent = '未配置';
-            tokenHint.textContent = '⚠️ 请配置 Token 以删除文章';
-            showToast('Token 已清除', 'success');
-            return false;
+            showToast('✅ Token 已保存');
+            tokenModal.classList.remove('active');
+            loadPosts(); // 保存后重新加载，带 token
+        } else if (!val) {
+            clearToken();
         } else {
             tokenHint.textContent = '⚠️ Token 格式错误，应以 ghp_ 开头';
             showToast('⚠️ Token 格式错误', 'error');
-            return false;
         }
     }
 
-    tokenStatusBar.addEventListener('click', () => {
+    function clearToken() {
+        localStorage.removeItem(STORAGE_KEY);
+        token = '';
+        tokenInput.value = '';
+        tokenDot.className = 'dot inactive';
+        tokenLabel.textContent = '未配置';
+        tokenHint.textContent = '⚠️ 请配置 Token 以删除文章';
+        tokenModal.classList.remove('active');
+        showToast('Token 已清除');
+    }
+
+    document.getElementById('tokenStatusBar').addEventListener('click', () => {
         tokenModal.classList.add('active');
         tokenInput.focus();
-    });
-
-    document.getElementById('tokenSaveBtn').addEventListener('click', () => {
-        const val = tokenInput.value.trim();
-        saveToken(val);
-        if (val && val.startsWith('ghp_')) {
-            tokenModal.classList.remove('active');
-            loadPosts(); // Token 保存后重新加载，因为列表请求会带上 Token
-        }
-    });
-
-    document.getElementById('tokenClearBtn').addEventListener('click', () => {
-        tokenInput.value = '';
-        saveToken('');
-        tokenModal.classList.remove('active');
-        loadPosts(); // 清除 Token 后重新加载（不带 Token）
     });
 
     tokenModal.addEventListener('click', (e) => {
@@ -698,178 +388,62 @@
     });
 
     tokenInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') document.getElementById('tokenSaveBtn').click();
+        if (e.key === 'Enter') saveTokenAndClose();
     });
 
-    // ================================================================
-    // 缓存相关
-    // ================================================================
-    function loadCache() {
-        try {
-            const raw = localStorage.getItem(CACHE_KEY);
-            if (raw) return JSON.parse(raw);
-        } catch (e) {
-            console.warn('读取缓存失败:', e);
-        }
-        return {};
-    }
-
-    function saveCache(cache) {
-        try {
-            localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
-        } catch (e) {
-            console.warn('保存缓存失败:', e);
-        }
-    }
-
-    // ================================================================
-    // 获取文章列表（优化：并发 + 缓存 + 带 Token）
-    // ================================================================
+    // ========== 获取文章列表 ==========
     async function fetchPosts() {
-        try {
-            // 1. 文件列表请求带上 Token（提升 API 限额）
-            const headers = {};
-            if (token) headers['Authorization'] = `token ${token}`;
-
-            const res = await fetch(API_URL, { headers });
-            if (!res.ok) {
-                // 如果带 Token 失败，尝试不带 Token 请求（可能是 Token 无效）
-                if (token) {
-                    console.warn('带 Token 请求失败，尝试不带 Token 请求');
-                    const retryRes = await fetch(API_URL);
-                    if (retryRes.ok) {
-                        const files = await retryRes.json();
-                        return await processFiles(files);
-                    }
-                }
-                throw new Error('无法读取文章列表');
-            }
-
-            const files = await res.json();
-            return await processFiles(files);
-        } catch (err) {
-            console.error('加载失败:', err);
-            return null;
+        const headers = token ? { 'Authorization': `token ${token}` } : {};
+        const res = await fetch(API_URL, { headers });
+        if (!res.ok) {
+            throw new Error(`API 请求失败 (状态码 ${res.status})`);
         }
-    }
-
-    // 处理文件列表：并发读取内容 + 使用缓存
-    async function processFiles(files) {
+        const files = await res.json();
         const posts = files.filter(f => f.name.endsWith('.md'));
         posts.sort((a, b) => b.name.localeCompare(a.name));
 
-        const cache = loadCache();
-        const updatedCache = {};
-        const postsWithMeta = [];
-
-        // 并发请求所有文章内容
+        // 并发获取每篇文章的标题和日期
         const tasks = posts.map(async (post) => {
-            // 如果缓存中存在且 sha 未变，直接使用缓存
-            const cached = cache[post.name];
-            if (cached && cached.sha === post.sha) {
-                updatedCache[post.name] = cached;
-                postsWithMeta.push({
-                    filename: post.name,
-                    sha: post.sha,
-                    title: cached.title,
-                    date: cached.date,
-                    rawDate: cached.rawDate,
-                    dateObj: cached.rawDate ? new Date(cached.rawDate) : null
-                });
-                return;
-            }
-
             try {
                 const contentRes = await fetch(post.download_url);
-                if (!contentRes.ok) throw new Error('内容请求失败');
-
+                if (!contentRes.ok) return null;
                 const contentText = await contentRes.text();
                 const titleMatch = contentText.match(/title:\s*(.+)/);
                 const dateMatch = contentText.match(/date:\s*(.+)/);
-
                 const title = titleMatch ? titleMatch[1].trim() : post.name.replace('.md', '');
                 const rawDate = dateMatch ? dateMatch[1].trim() : '';
                 const date = rawDate || '未知日期';
-
-                const meta = {
-                    title: title,
-                    date: date,
-                    rawDate: rawDate,
-                    sha: post.sha
-                };
-
-                updatedCache[post.name] = meta;
-                postsWithMeta.push({
+                return {
                     filename: post.name,
                     sha: post.sha,
                     title: title,
                     date: date,
                     rawDate: rawDate,
                     dateObj: rawDate ? new Date(rawDate) : null
-                });
-            } catch (err) {
-                console.warn('读取文章失败:', post.name, err.message);
-                // 如果有旧缓存，即使 sha 不同也先展示缓存，避免列表缺失
-                if (cached) {
-                    const fallbackMeta = { ...cached, sha: post.sha };
-                    updatedCache[post.name] = fallbackMeta;
-                    postsWithMeta.push({
-                        filename: post.name,
-                        sha: post.sha,
-                        title: cached.title,
-                        date: cached.date,
-                        rawDate: cached.rawDate,
-                        dateObj: cached.rawDate ? new Date(cached.rawDate) : null
-                    });
-                }
+                };
+            } catch (e) {
+                return null;
             }
         });
 
-        await Promise.all(tasks);
-
-        // 并发返回顺序可能乱，重新排序
-        postsWithMeta.sort((a, b) => b.filename.localeCompare(a.filename));
-
-        // 保存新缓存
-        saveCache(updatedCache);
-
-        return postsWithMeta;
+        const results = await Promise.all(tasks);
+        return results.filter(p => p !== null);
     }
 
-    // ================================================================
-    // 渲染文章列表
-    // ================================================================
+    // ========== 渲染 ==========
     function renderPosts(posts) {
-        postsData = posts || [];
-
-        if (posts === null) {
-            postList.innerHTML = `
-                <div class="empty-state">
-                    <div class="icon">⚠️</div>
-                    <div class="text">加载失败，请检查网络或仓库权限</div>
-                    <div class="sub">点击「刷新」重试</div>
-                </div>
-            `;
-            return;
-        }
+        postsData = posts;
+        $('postCount').textContent = posts.length + ' 篇';
+        $('lastUpdateTime').textContent = '更新于 ' + new Date().toLocaleTimeString();
 
         if (posts.length === 0) {
             postList.innerHTML = `
                 <div class="empty-state">
-                    <div class="icon">📝</div>
-                    <div class="text">还没有文章</div>
-                    <div class="sub">点击「写新文章」开始创作</div>
+                    <div>📝 还没有文章，点「写新文章」开始创作</div>
                 </div>
             `;
-            updateStats(posts);
-            postCount.textContent = '0 篇';
-            lastUpdateTime.textContent = '暂无数据';
             return;
         }
-
-        updateStats(posts);
-        postCount.textContent = posts.length + ' 篇';
-        lastUpdateTime.textContent = '更新于 ' + new Date().toLocaleTimeString();
 
         let html = '';
         for (const post of posts) {
@@ -880,64 +454,44 @@
                         <span class="title">${post.title}</span>
                         <div class="meta">
                             <span>${post.date}</span>
-                            ${post.rawDate ? `<span class="tag">📅 ${post.rawDate}</span>` : ''}
                         </div>
                     </div>
                     <div class="right">
-                        <a href="${detailUrl}" target="_blank" class="view-link" title="查看详情">👁️</a>
-                        <button class="btn-icon" onclick="deletePost(this)" title="删除文章">🗑️</button>
+                        <a href="${detailUrl}" target="_blank" class="view-link" title="查看">👁️</a>
+                        <button class="btn-icon" onclick="deletePost(this)" title="删除">🗑️</button>
                     </div>
                 </div>
             `;
         }
-
         postList.innerHTML = html;
     }
 
-    // ================================================================
-    // 更新统计
-    // ================================================================
-    function updateStats(posts) {
-        const total = posts.length;
-        statTotal.textContent = total;
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const todayPosts = posts.filter(p => {
-            if (!p.dateObj) return false;
-            const d = new Date(p.dateObj);
-            d.setHours(0, 0, 0, 0);
-            return d.getTime() === today.getTime();
-        });
-        statToday.textContent = todayPosts.length;
-
-        const weekAgo = new Date();
-        weekAgo.setDate(weekAgo.getDate() - 7);
-        const weekPosts = posts.filter(p => {
-            if (!p.dateObj) return false;
-            return p.dateObj >= weekAgo;
-        });
-        statThisWeek.textContent = weekPosts.length;
-    }
-
-    // ================================================================
-    // 加载文章（带 loading 状态）
-    // ================================================================
+    // ========== 加载 ==========
     async function loadPosts() {
         postList.innerHTML = `
             <div class="loading-state">
                 <div class="spinner"></div>
-                <div class="text">加载中...</div>
+                <div>加载中...</div>
             </div>
         `;
-
-        const posts = await fetchPosts();
-        renderPosts(posts);
+        try {
+            const posts = await fetchPosts();
+            renderPosts(posts);
+        } catch (err) {
+            console.error('加载失败:', err);
+            postList.innerHTML = `
+                <div class="error-state">
+                    <div>⚠️ 加载失败：${err.message}</div>
+                    <div style="margin-top:10px;">
+                        <button class="btn btn-outline btn-sm" onclick="loadPosts()">🔄 重试</button>
+                    </div>
+                </div>
+            `;
+            showToast('❌ 加载失败', 'error');
+        }
     }
 
-    // ================================================================
-    // 删除文章（优化：不重新全量请求，直接更新本地数据）
-    // ================================================================
+    // ========== 删除文章 ==========
     async function deletePost(btn) {
         const item = btn.closest('.post-item');
         if (!item) return;
@@ -945,7 +499,6 @@
         const filename = item.dataset.filename;
         const sha = item.dataset.sha;
 
-        // 检查 Token
         if (!token) {
             const saved = localStorage.getItem(STORAGE_KEY);
             if (saved && saved.startsWith('ghp_')) {
@@ -953,7 +506,7 @@
                 tokenDot.className = 'dot active';
                 tokenLabel.textContent = '已配置';
             } else {
-                showToast('⚠️ 请先配置 GitHub Token', 'error');
+                showToast('⚠️ 请先配置 Token', 'error');
                 tokenModal.classList.add('active');
                 tokenInput.focus();
                 return;
@@ -981,18 +534,12 @@
             });
 
             if (res.ok) {
-                // 1. 添加删除动画
                 item.classList.add('deleting');
                 setTimeout(() => {
-                    // 2. 从 postsData 中移除该项
+                    // 直接从本地列表移除，不重新请求
                     postsData = postsData.filter(p => p.filename !== filename);
-                    // 3. 重新渲染列表（不会重新请求，直接使用本地数据）
                     renderPosts(postsData);
-                    // 4. 从缓存中移除该项
-                    const cache = loadCache();
-                    delete cache[filename];
-                    saveCache(cache);
-                    showToast(`✅ 已删除「${filename}」`, 'success');
+                    showToast(`✅ 已删除`);
                 }, 250);
             } else {
                 const err = await res.json();
@@ -1007,24 +554,9 @@
         }
     }
 
-    // ================================================================
-    // 事件绑定
-    // ================================================================
-    document.getElementById('refreshBtn').addEventListener('click', () => {
-        loadPosts();
-        showToast('🔄 已刷新', 'success');
-    });
-
-    // ================================================================
-    // 初始化
-    // ================================================================
+    // ========== 初始化 ==========
     loadToken();
     loadPosts();
-
-    // 自动刷新：每 15 分钟（减少无谓刷新）
-    setInterval(() => {
-        loadPosts();
-    }, 15 * 60 * 1000);
 </script>
 
 </body>
