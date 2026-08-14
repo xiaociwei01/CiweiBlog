@@ -9,7 +9,7 @@
             --primary: #1a1a2e;
             --primary-hover: #2d2d4a;
             --bg: #f5f7fa;
-            --card-bg: rgba(255, 255, 255, 0.8);
+            --card-bg: rgba(255, 255, 255, 0.85);
             --card-border: rgba(255, 255, 255, 0.6);
             --text: #1a1a2e;
             --text-muted: #555;
@@ -31,11 +31,7 @@
             padding: 24px 16px 60px;
             overflow-x: hidden;
         }
-        .container {
-            width: 100%;
-            max-width: 680px;
-        }
-        /* 页面头部 */
+        .container { width: 100%; max-width: 680px; }
         .header {
             display: flex;
             align-items: center;
@@ -44,11 +40,7 @@
             opacity: 0;
             animation: fadeUp 0.5s ease forwards;
         }
-        .header .title {
-            font-size: 26px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
+        .header .title { font-size: 26px; font-weight: 700; letter-spacing: 0.5px; }
         .header .back-link {
             color: var(--text-muted);
             text-decoration: none;
@@ -60,11 +52,7 @@
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
         }
-        .header .back-link:hover {
-            background: rgba(255,255,255,0.9);
-            transform: translateX(-2px);
-        }
-        /* 主卡片 */
+        .header .back-link:hover { background: rgba(255,255,255,0.9); transform: translateX(-2px); }
         .write-card {
             background: var(--card-bg);
             backdrop-filter: blur(20px);
@@ -77,15 +65,8 @@
             opacity: 0;
             animation: fadeUp 0.5s ease 0.1s forwards;
         }
-        .write-card label {
-            display: block;
-            font-weight: 600;
-            font-size: 15px;
-            margin-bottom: 8px;
-            color: var(--text);
-        }
-        .write-card input[type="text"],
-        .write-card textarea {
+        .write-card label { display: block; font-weight: 600; font-size: 15px; margin-bottom: 8px; }
+        .write-card input[type="text"], .write-card textarea {
             width: 100%;
             padding: 14px 16px;
             border: 1px solid rgba(0,0,0,0.08);
@@ -97,16 +78,11 @@
             outline: none;
             color: var(--text);
         }
-        .write-card input[type="text"]:focus,
-        .write-card textarea:focus {
+        .write-card input[type="text"]:focus, .write-card textarea:focus {
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(26, 26, 46, 0.1);
         }
-        .write-card textarea {
-            min-height: 280px;
-            resize: vertical;
-            line-height: 1.6;
-        }
+        .write-card textarea { min-height: 280px; resize: vertical; line-height: 1.6; }
         .time-hint {
             background: rgba(255,255,255,0.6);
             border-radius: 12px;
@@ -116,11 +92,7 @@
             color: var(--text-muted);
             border: 1px solid rgba(0,0,0,0.05);
         }
-        .time-hint strong {
-            color: var(--primary);
-            font-weight: 600;
-        }
-        /* 上传区域 */
+        .time-hint strong { color: var(--primary); font-weight: 600; }
         .upload-area {
             border: 2px dashed rgba(26, 26, 46, 0.2);
             border-radius: 16px;
@@ -133,58 +105,20 @@
             margin: 12px 0;
             position: relative;
         }
-        .upload-area:hover {
-            border-color: var(--primary);
-            background: rgba(255,255,255,0.7);
-            transform: translateY(-2px);
-        }
-        .upload-area.dragover {
-            border-color: var(--primary);
-            background: rgba(26, 26, 46, 0.05);
-            transform: scale(1.01);
-        }
-        .upload-area input[type="file"] {
-            display: none;
-        }
-        .upload-area .icon {
-            font-size: 36px;
-            margin-bottom: 8px;
-        }
-        .upload-status {
-            font-size: 13px;
-            margin-top: 8px;
-            color: var(--text-muted);
-            min-height: 20px;
-        }
+        .upload-area:hover { border-color: var(--primary); background: rgba(255,255,255,0.7); transform: translateY(-2px); }
+        .upload-area.dragover { border-color: var(--primary); background: rgba(26, 26, 46, 0.05); transform: scale(1.01); }
+        .upload-area input[type="file"] { display: none; }
+        .upload-area .icon { font-size: 36px; margin-bottom: 8px; }
+        .upload-status { font-size: 13px; margin-top: 8px; color: var(--text-muted); min-height: 20px; }
         .upload-status .success { color: var(--green); }
         .upload-status .error { color: var(--red); }
-        /* Token 区域 */
-        .token-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .token-row input {
-            flex: 1;
-            min-width: 200px;
-            background: rgba(255,255,255,0.6);
-        }
-        .token-status {
-            font-size: 14px;
-            font-weight: 500;
-        }
+        .token-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .token-row input { flex: 1; min-width: 200px; background: rgba(255,255,255,0.6); }
+        .token-status { font-size: 14px; font-weight: 500; }
         .token-status.success { color: var(--green); }
         .token-status.error { color: var(--red); }
-        .forget-link {
-            color: var(--text-faint);
-            cursor: pointer;
-            text-decoration: underline;
-            margin-left: 8px;
-            transition: color var(--transition);
-        }
+        .forget-link { color: var(--text-faint); cursor: pointer; text-decoration: underline; margin-left: 8px; }
         .forget-link:hover { color: var(--red); }
-        /* 按钮 */
         .btn-publish {
             width: 100%;
             padding: 16px;
@@ -201,20 +135,9 @@
             position: relative;
             overflow: hidden;
         }
-        .btn-publish:hover {
-            background: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(26,26,46,0.25);
-        }
-        .btn-publish:active {
-            transform: scale(0.97);
-        }
-        .btn-publish:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
+        .btn-publish:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(26,26,46,0.25); }
+        .btn-publish:active { transform: scale(0.97); }
+        .btn-publish:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
         .btn-publish .spinner {
             display: inline-block;
             width: 20px;
@@ -227,26 +150,18 @@
             margin-right: 8px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .status-msg {
-            margin-top: 16px;
-            font-size: 14px;
-            text-align: center;
-            color: var(--text-muted);
-        }
+        .status-msg { margin-top: 16px; font-size: 14px; text-align: center; color: var(--text-muted); }
         .status-msg.success { color: var(--green); }
         .status-msg.error { color: var(--red); }
-        /* 动画 */
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(16px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        /* 响应式 */
         @media (max-width: 480px) {
             .write-card { padding: 20px 16px; }
             .header .title { font-size: 22px; }
             .upload-area { padding: 20px 15px; }
         }
-        /* 毛玻璃提示 */
         .glass-note {
             background: rgba(255,255,255,0.4);
             border-radius: 12px;
@@ -254,8 +169,6 @@
             font-size: 13px;
             color: var(--text-muted);
             margin-top: 8px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
         }
     </style>
 </head>
@@ -272,9 +185,7 @@
 
             <div style="margin-top: 16px;">
                 <label>📅 发布时间</label>
-                <div class="time-hint" id="timeHint">
-                    ⏱️ 将自动记录为：<strong id="timeDisplay">加载中...</strong>
-                </div>
+                <div class="time-hint">⏱️ 将自动记录为：<strong id="timeDisplay">加载中...</strong></div>
             </div>
 
             <div style="margin-top: 16px;">
@@ -315,9 +226,8 @@
     <script>
         const REPO = 'xiaociwei01/CiweiBlog';
         const STORAGE_KEY = 'ciwei_blog_token';
-        const CACHE_KEY = 'ciwei_blog_posts_cache'; // 后台管理页缓存
+        const CACHE_KEY = 'ciwei_blog_posts_cache';
 
-        // 时间工具
         function getCurrentTime() {
             const now = new Date();
             const year = now.getFullYear();
@@ -333,14 +243,12 @@
             };
         }
 
-        // 更新时间显示
         function updateTimeDisplay() {
             document.getElementById('timeDisplay').textContent = getCurrentTime().fullStr;
         }
         updateTimeDisplay();
         setInterval(updateTimeDisplay, 60000);
 
-        // Token 管理
         let token = '';
         function loadSavedToken() {
             const saved = localStorage.getItem(STORAGE_KEY);
@@ -391,7 +299,6 @@
             else forgetToken();
         });
 
-        // 上传区域
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
         const uploadStatus = document.getElementById('uploadStatus');
@@ -440,7 +347,6 @@
                     const ext = file.name.split('.').pop().toLowerCase();
                     const baseName = file.name.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '-');
                     const safeName = baseName || 'file';
-                    // 使用时间戳避免重名
                     const filename = `${safeName}-${Date.now()}.${ext}`;
                     const path = `images/${year}/${month}/${filename}`;
 
@@ -459,18 +365,19 @@
                         body: JSON.stringify(payload)
                     });
                     if (res.ok) {
-                        const rawUrl = `https://raw.githubusercontent.com/${REPO}/main/${path}`;
+                        // 使用 jsDelivr CDN 地址，加载更快
+                        const cdnUrl = `https://cdn.jsdelivr.net/gh/${REPO}@main/${path}`;
                         const isVideo = file.type.startsWith('video/');
                         const markdown = isVideo
-                            ? `<video controls src="${rawUrl}" style="max-width:100%;border-radius:8px;"></video>`
-                            : `![](${rawUrl})`;
+                            ? `<video controls src="${cdnUrl}" preload="metadata" style="max-width:100%;border-radius:8px;"></video>`
+                            : `![](${cdnUrl})`;
                         const bodyTextarea = document.getElementById('body');
                         const cursorPos = bodyTextarea.selectionStart || bodyTextarea.value.length;
                         const before = bodyTextarea.value.substring(0, cursorPos);
                         const after = bodyTextarea.value.substring(cursorPos);
                         bodyTextarea.value = before + markdown + '\n\n' + after;
                         bodyTextarea.dispatchEvent(new Event('input'));
-                        uploadStatus.innerHTML = `<span class="success">✅ ${file.name} 上传成功，已插入正文</span>`;
+                        uploadStatus.innerHTML = `<span class="success">✅ ${file.name} 上传成功，已插入正文（使用 CDN 加速）</span>`;
                     } else {
                         const err = await res.json();
                         uploadStatus.innerHTML = `<span class="error">❌ ${file.name} 上传失败：${err.message || '未知错误'}</span>`;
@@ -481,7 +388,6 @@
             }
         }
 
-        // 发布文章
         document.getElementById('publishBtn').addEventListener('click', async function() {
             const title = document.getElementById('title').value.trim();
             const tags = document.getElementById('tags').value.trim();
@@ -501,7 +407,6 @@
             const time = getCurrentTime();
             const fullStr = time.fullStr;
             const filenamePrefix = time.filenamePrefix;
-            // 使用时间戳作为文件名，避免中文和特殊字符
             const timestamp = Date.now();
             const filename = `${filenamePrefix}-${timestamp}.md`;
 
@@ -514,24 +419,11 @@
             btn.innerHTML = '<span class="spinner"></span> 发布中...';
 
             try {
-                let sha = '';
-                // 检查文件是否已存在（基本不可能，但保留逻辑）
-                try {
-                    const checkRes = await fetch(url, {
-                        headers: { 'Authorization': `token ${currentToken}` }
-                    });
-                    if (checkRes.ok) {
-                        const data = await checkRes.json();
-                        sha = data.sha;
-                    }
-                } catch (e) {}
-
                 const payload = {
                     message: `添加文章: ${title}`,
                     content: btoa(unescape(encodeURIComponent(content))),
                     branch: 'main'
                 };
-                if (sha) payload.sha = sha;
 
                 const res = await fetch(url, {
                     method: 'PUT',
@@ -543,7 +435,6 @@
                 });
 
                 if (res.ok) {
-                    // 清除后台管理页缓存，使新文章立即出现
                     localStorage.removeItem(CACHE_KEY);
                     document.getElementById('statusMsg').innerHTML = `
                         <span class="success">✅ 发布成功！发布时间：${fullStr}</span>
@@ -551,10 +442,6 @@
                     `;
                     btn.innerHTML = originalText;
                     btn.disabled = false;
-                    // 可选：清空表单
-                    // document.getElementById('title').value = '';
-                    // document.getElementById('tags').value = '';
-                    // document.getElementById('body').value = '';
                 } else {
                     const err = await res.json();
                     document.getElementById('statusMsg').innerHTML = `<span class="error">❌ 发布失败：${err.message || '未知错误'}</span>`;
@@ -568,7 +455,6 @@
             }
         });
 
-        // 初始化
         loadSavedToken();
     </script>
 </body>
