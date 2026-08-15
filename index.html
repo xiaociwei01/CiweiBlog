@@ -28,55 +28,21 @@
         }
         .nav-left { display: flex; align-items: center; gap: 12px; }
         .nav-left .logo { font-size: 22px; font-weight: 700; }
-        .nav-left .badge {
-            background: #e8ecf0;
-            font-size: 11px;
-            color: #888;
-            padding: 2px 10px;
-            border-radius: 12px;
-        }
+        .nav-left .badge { background: #e8ecf0; font-size: 11px; color: #888; padding: 2px 10px; border-radius: 12px; }
         .token-status-bar {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: #888;
-            background: #f5f6f8;
-            padding: 6px 16px;
-            border-radius: 30px;
-            border: 1px solid #e8ecf0;
-            cursor: pointer;
-            user-select: none;
+            display: flex; align-items: center; gap: 8px; font-size: 13px; color: #888;
+            background: #f5f6f8; padding: 6px 16px; border-radius: 30px; border: 1px solid #e8ecf0; cursor: pointer;
         }
-        .token-status-bar .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
+        .token-status-bar .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
         .token-status-bar .dot.active { background: #22c55e; }
         .token-status-bar .dot.inactive { background: #d0d5dd; }
         .action-bar {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 20px;
+            display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px;
         }
         .action-left { display: flex; align-items: center; gap: 10px; }
         .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 10px 22px;
-            border-radius: 40px;
-            font-size: 14px;
-            font-weight: 500;
-            border: none;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 6px; padding: 10px 22px; border-radius: 40px;
+            font-size: 14px; font-weight: 500; border: none; cursor: pointer; text-decoration: none; transition: all 0.2s;
         }
         .btn-primary { background: #1a1a2e; color: #fff; }
         .btn-primary:hover { background: #2d2d4a; }
@@ -85,166 +51,56 @@
         .btn-sm { padding: 6px 16px; font-size: 13px; }
         .post-list { display: flex; flex-direction: column; gap: 10px; }
         .post-item {
-            background: #ffffff;
-            border-radius: 14px;
-            padding: 16px 18px;
-            border: 1px solid #e8ecf0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: all 0.2s;
+            background: #ffffff; border-radius: 14px; padding: 16px 18px; border: 1px solid #e8ecf0;
+            display: flex; align-items: center; justify-content: space-between; transition: all 0.2s;
         }
-        .post-item:hover {
-            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
-            border-color: #d5dbe3;
-        }
-        .post-item.deleting {
-            opacity: 0;
-            transform: scale(0.95);
-            transition: all 0.25s;
-        }
+        .post-item:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.05); border-color: #d5dbe3; }
+        .post-item.deleting { opacity: 0; transform: scale(0.95); transition: all 0.25s; }
+        .post-item.pinned { border-left: 4px solid #f59e0b; }
         .post-item .left { flex: 1; min-width: 0; cursor: pointer; }
-        .post-item .left .title {
-            font-size: 15px;
-            font-weight: 600;
-            color: #1a1a2e;
-            display: block;
-            text-decoration: none;
-        }
-        .post-item .left .meta {
-            font-size: 12px;
-            color: #bbb;
-            margin-top: 2px;
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .post-item .right {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-shrink: 0;
-            margin-left: 12px;
-        }
+        .post-item .left .title { font-size: 15px; font-weight: 600; color: #1a1a2e; display: block; text-decoration: none; }
+        .post-item .left .title .badge-pin { font-size: 12px; color: #f59e0b; margin-left: 6px; }
+        .post-item .left .title .badge-modified { font-size: 12px; color: #3b82f6; margin-left: 6px; }
+        .post-item .left .meta { font-size: 12px; color: #bbb; margin-top: 2px; display: flex; gap: 12px; flex-wrap: wrap; }
+        .post-item .right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; margin-left: 12px; }
         .post-item .right .btn-icon {
-            background: none;
-            border: none;
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            color: #ccc;
-            cursor: pointer;
-            transition: all 0.2s;
+            background: none; border: none; width: 34px; height: 34px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-size: 16px; color: #ccc; cursor: pointer; transition: all 0.2s;
         }
         .post-item .right .btn-icon:hover { background: #f5f5f5; color: #dc2626; }
+        .post-item .right .btn-icon.pin-active { color: #f59e0b; }
         .post-item .right .btn-icon:disabled { opacity: 0.3; cursor: not-allowed; }
         .post-item .right .view-link {
-            background: none;
-            border: none;
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 15px;
-            color: #bbb;
-            cursor: pointer;
-            text-decoration: none;
+            background: none; border: none; width: 34px; height: 34px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-size: 15px; color: #bbb; cursor: pointer; text-decoration: none;
         }
         .post-item .right .view-link:hover { background: #f0f2f5; color: #555; }
         .empty-state, .loading-state, .error-state {
-            text-align: center;
-            padding: 60px 20px;
-            background: #ffffff;
-            border-radius: 14px;
-            border: 1px solid #e8ecf0;
-            color: #888;
+            text-align: center; padding: 60px 20px; background: #ffffff; border-radius: 14px; border: 1px solid #e8ecf0; color: #888;
         }
         .loading-state .spinner {
-            display: inline-block;
-            width: 28px;
-            height: 28px;
-            border: 3px solid #eee;
-            border-top: 3px solid #1a1a2e;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-bottom: 12px;
+            display: inline-block; width: 28px; height: 28px; border: 3px solid #eee; border-top: 3px solid #1a1a2e;
+            border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
         .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(80px);
-            background: #1a1a2e;
-            color: #fff;
-            padding: 12px 24px;
-            border-radius: 40px;
-            font-size: 14px;
-            opacity: 0;
-            transition: all 0.35s;
-            pointer-events: none;
-            z-index: 1000;
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a1a2e;
+            color: #fff; padding: 12px 24px; border-radius: 40px; font-size: 14px; opacity: 0; transition: all 0.35s; pointer-events: none; z-index: 1000;
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         .toast.error { background: #dc2626; }
         .token-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5);
+            z-index: 999; align-items: center; justify-content: center; padding: 20px;
         }
         .token-modal.active { display: flex; }
-        .token-modal .modal-box {
-            background: #fff;
-            border-radius: 20px;
-            padding: 28px;
-            max-width: 420px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-        }
-        .token-modal .modal-box .title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-        .token-modal .modal-box .desc {
-            font-size: 13px;
-            color: #888;
-            margin-bottom: 16px;
-        }
-        .token-modal .modal-box input {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid #d0d5dd;
-            border-radius: 10px;
-            font-size: 14px;
-            outline: none;
-        }
+        .token-modal .modal-box { background: #fff; border-radius: 20px; padding: 28px; max-width: 420px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+        .token-modal .modal-box .title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+        .token-modal .modal-box .desc { font-size: 13px; color: #888; margin-bottom: 16px; }
+        .token-modal .modal-box input { width: 100%; padding: 12px 14px; border: 1px solid #d0d5dd; border-radius: 10px; font-size: 14px; outline: none; }
         .token-modal .modal-box input:focus { border-color: #1a1a2e; }
-        .token-modal .modal-box .hint {
-            font-size: 12px;
-            color: #aaa;
-            margin-top: 6px;
-        }
-        .token-modal .modal-box .actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 16px;
-            justify-content: flex-end;
-        }
+        .token-modal .modal-box .hint { font-size: 12px; color: #aaa; margin-top: 6px; }
+        .token-modal .modal-box .actions { display: flex; gap: 10px; margin-top: 16px; justify-content: flex-end; }
         @media (max-width: 600px) {
             .nav-bar { padding: 8px 0 12px; }
             .nav-left .logo { font-size: 19px; }
@@ -279,10 +135,7 @@
     </div>
 
     <div id="postList" class="post-list">
-        <div class="loading-state">
-            <div class="spinner"></div>
-            <div>加载中...</div>
-        </div>
+        <div class="loading-state"><div class="spinner"></div><div>加载中...</div></div>
     </div>
 </div>
 
@@ -291,7 +144,7 @@
 <div class="token-modal" id="tokenModal">
     <div class="modal-box">
         <div class="title">🔑 GitHub Token</div>
-        <div class="desc">用于删除文章和媒体文件，Token 仅保存在你的浏览器中。</div>
+        <div class="desc">用于删除文章、修改文章和置顶操作，Token 仅保存在你的浏览器中。</div>
         <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
         <div class="hint" id="tokenHint">输入后自动保存</div>
         <div class="actions">
@@ -307,6 +160,7 @@
     const API_URL = `https://api.github.com/repos/${REPO}/contents/${POSTS_PATH}`;
     const STORAGE_KEY = 'ciwei_blog_token';
     const DETAIL_PAGE = 'Xiangqingye.html';
+    const EDIT_PAGE = 'write.html';
 
     let token = '';
     let postsData = [];
@@ -321,7 +175,7 @@
     const tokenLabel = $('tokenLabel');
 
     let toastTimer = null;
-    function showToast(msg, type = 'success') {
+    function showToast(msg, type='success') {
         toast.textContent = msg;
         toast.className = 'toast ' + type;
         void toast.offsetWidth;
@@ -330,7 +184,7 @@
         toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
-    // ========== Token ==========
+    // Token
     function loadToken() {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved && saved.startsWith('ghp_')) {
@@ -341,10 +195,9 @@
             tokenHint.textContent = '✅ Token 已配置';
         } else {
             token = '';
-            tokenInput.value = '';
             tokenDot.className = 'dot inactive';
             tokenLabel.textContent = '未配置';
-            tokenHint.textContent = '⚠️ 请配置 Token 以删除文章';
+            tokenHint.textContent = '⚠️ 请配置 Token 以删除/置顶/编辑文章';
         }
     }
 
@@ -373,7 +226,7 @@
         tokenInput.value = '';
         tokenDot.className = 'dot inactive';
         tokenLabel.textContent = '未配置';
-        tokenHint.textContent = '⚠️ 请配置 Token 以删除文章';
+        tokenHint.textContent = '⚠️ 请配置 Token 以删除/置顶/编辑文章';
         tokenModal.classList.remove('active');
         showToast('Token 已清除');
     }
@@ -382,80 +235,100 @@
         tokenModal.classList.add('active');
         tokenInput.focus();
     });
+    tokenModal.addEventListener('click', e => { if (e.target === tokenModal) tokenModal.classList.remove('active'); });
+    tokenInput.addEventListener('keydown', e => { if (e.key === 'Enter') saveTokenAndClose(); });
 
-    tokenModal.addEventListener('click', (e) => {
-        if (e.target === tokenModal) tokenModal.classList.remove('active');
-    });
+    // 解析 frontmatter
+    function parseFrontmatter(contentText) {
+        const result = { title: '', date: '', tags: '', pinned: false, modified: '' };
+        const lines = contentText.split('\n');
+        if (lines[0] === '---') {
+            const end = lines.indexOf('---', 1);
+            if (end !== -1) {
+                lines.slice(1, end).forEach(line => {
+                    if (line.startsWith('title:')) result.title = line.replace('title:', '').trim();
+                    if (line.startsWith('date:')) result.date = line.replace('date:', '').trim();
+                    if (line.startsWith('tags:')) result.tags = line.replace('tags:', '').trim();
+                    if (line.startsWith('pinned:')) result.pinned = line.replace('pinned:', '').trim() === 'true';
+                    if (line.startsWith('modified:')) result.modified = line.replace('modified:', '').trim();
+                });
+                result.bodyStart = end + 1;
+                result.rawFrontmatter = lines.slice(0, end + 1).join('\n');
+                result.body = lines.slice(end + 1).join('\n').trim();
+            }
+        }
+        return result;
+    }
 
-    tokenInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') saveTokenAndClose();
-    });
-
-    // ========== 获取文章列表 ==========
+    // 获取文章列表
     async function fetchPosts() {
         const headers = token ? { 'Authorization': `token ${token}` } : {};
         const res = await fetch(API_URL, { headers });
-        if (!res.ok) {
-            throw new Error(`API 请求失败 (状态码 ${res.status})`);
-        }
+        if (!res.ok) throw new Error(`API 请求失败 (状态码 ${res.status})`);
         const files = await res.json();
         const posts = files.filter(f => f.name.endsWith('.md'));
-        posts.sort((a, b) => b.name.localeCompare(a.name));
 
         const tasks = posts.map(async (post) => {
             try {
                 const contentRes = await fetch(post.download_url);
                 if (!contentRes.ok) return null;
                 const contentText = await contentRes.text();
-                const titleMatch = contentText.match(/title:\s*(.+)/);
-                const dateMatch = contentText.match(/date:\s*(.+)/);
-                const title = titleMatch ? titleMatch[1].trim() : post.name.replace('.md', '');
-                const rawDate = dateMatch ? dateMatch[1].trim() : '';
-                const date = rawDate || '未知日期';
+                const meta = parseFrontmatter(contentText);
+                const title = meta.title || post.name.replace('.md', '');
+                const date = meta.date || '未知日期';
                 return {
                     filename: post.name,
                     sha: post.sha,
-                    title: title,
-                    date: date,
-                    rawDate: rawDate,
-                    dateObj: rawDate ? new Date(rawDate) : null
+                    contentText: contentText,
+                    title,
+                    date,
+                    tags: meta.tags,
+                    pinned: meta.pinned,
+                    modified: meta.modified,
+                    dateObj: date !== '未知日期' ? new Date(date) : null
                 };
-            } catch (e) {
-                return null;
-            }
+            } catch { return null; }
         });
-
         const results = await Promise.all(tasks);
         return results.filter(p => p !== null);
     }
 
-    // ========== 渲染 ==========
     function renderPosts(posts) {
         postsData = posts;
         $('postCount').textContent = posts.length + ' 篇';
         $('lastUpdateTime').textContent = '更新于 ' + new Date().toLocaleTimeString();
 
-        if (posts.length === 0) {
-            postList.innerHTML = `
-                <div class="empty-state">
-                    <div>📝 还没有文章，点「写新文章」开始创作</div>
-                </div>
-            `;
+        // 置顶优先，然后按文件名倒序
+        const sorted = [...posts].sort((a, b) => {
+            if (a.pinned && !b.pinned) return -1;
+            if (!a.pinned && b.pinned) return 1;
+            return b.filename.localeCompare(a.filename);
+        });
+
+        if (sorted.length === 0) {
+            postList.innerHTML = `<div class="empty-state"><div>📝 还没有文章，点「写新文章」开始创作</div></div>`;
             return;
         }
 
         let html = '';
-        for (const post of posts) {
+        for (const post of sorted) {
             const detailUrl = `${DETAIL_PAGE}?file=${encodeURIComponent(post.filename)}`;
+            const editUrl = `${EDIT_PAGE}?file=${encodeURIComponent(post.filename)}`;
+            const pinIcon = post.pinned ? '📌' : '📌';
+            const pinTitle = post.pinned ? '取消置顶' : '置顶文章';
+            const pinClass = post.pinned ? 'pin-active' : '';
+            const pinBadge = post.pinned ? '<span class="badge-pin">📌 置顶</span>' : '';
+            const modifiedBadge = post.modified ? '<span class="badge-modified">✏️ 已修改</span>' : '';
+
             html += `
-                <div class="post-item" data-filename="${post.filename}" data-sha="${post.sha}">
+                <div class="post-item ${post.pinned ? 'pinned' : ''}" data-filename="${post.filename}" data-sha="${post.sha}">
                     <div class="left" onclick="window.open('${detailUrl}', '_blank')">
-                        <span class="title">${post.title}</span>
-                        <div class="meta">
-                            <span>${post.date}</span>
-                        </div>
+                        <span class="title">${post.title} ${pinBadge}${modifiedBadge}</span>
+                        <div class="meta"><span>${post.date}</span></div>
                     </div>
                     <div class="right">
+                        <button class="btn-icon ${pinClass}" onclick="togglePin(this)" title="${pinTitle}">${pinIcon}</button>
+                        <a href="${editUrl}" class="view-link" title="编辑">✏️</a>
                         <a href="${detailUrl}" target="_blank" class="view-link" title="查看">👁️</a>
                         <button class="btn-icon" onclick="deletePost(this)" title="删除">🗑️</button>
                     </div>
@@ -465,170 +338,152 @@
         postList.innerHTML = html;
     }
 
-    // ========== 加载 ==========
     async function loadPosts() {
-        postList.innerHTML = `
-            <div class="loading-state">
-                <div class="spinner"></div>
-                <div>加载中...</div>
-            </div>
-        `;
+        postList.innerHTML = `<div class="loading-state"><div class="spinner"></div><div>加载中...</div></div>`;
         try {
             const posts = await fetchPosts();
             renderPosts(posts);
         } catch (err) {
-            console.error('加载失败:', err);
-            postList.innerHTML = `
-                <div class="error-state">
-                    <div>⚠️ 加载失败：${err.message}</div>
-                    <div style="margin-top:10px;">
-                        <button class="btn btn-outline btn-sm" onclick="loadPosts()">🔄 重试</button>
-                    </div>
-                </div>
-            `;
+            postList.innerHTML = `<div class="error-state"><div>⚠️ 加载失败：${err.message}</div><div style="margin-top:10px;"><button class="btn btn-outline btn-sm" onclick="loadPosts()">🔄 重试</button></div></div>`;
             showToast('❌ 加载失败', 'error');
         }
     }
 
-    // ========== 从文章内容中提取媒体路径 ==========
+    // 修改 frontmatter 中的 pinned 字段
+    function updatePinnedInContent(contentText, pinned) {
+        const lines = contentText.split('\n');
+        let hasPinned = false;
+        let inFrontmatter = false;
+        for (let i = 0; i < lines.length; i++) {
+            if (lines[i] === '---') {
+                if (!inFrontmatter) { inFrontmatter = true; continue; }
+                else break;
+            }
+            if (inFrontmatter && lines[i].startsWith('pinned:')) {
+                lines[i] = `pinned: ${pinned}`;
+                hasPinned = true;
+                break;
+            }
+        }
+        if (!hasPinned) {
+            // 插入到 date 或 tags 后面
+            let insertIndex = -1;
+            for (let i = 0; i < lines.length; i++) {
+                if (lines[i].startsWith('date:') || lines[i].startsWith('tags:')) insertIndex = i;
+            }
+            if (insertIndex !== -1) {
+                lines.splice(insertIndex + 1, 0, `pinned: ${pinned}`);
+            } else {
+                // 直接在第一个 --- 后插入
+                lines.splice(1, 0, `pinned: ${pinned}`);
+            }
+        }
+        return lines.join('\n');
+    }
+
+    async function togglePin(btn) {
+        const item = btn.closest('.post-item');
+        const filename = item.dataset.filename;
+        const sha = item.dataset.sha;
+        if (!token) {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved && saved.startsWith('ghp_')) { token = saved; }
+            else { showToast('⚠️ 请先配置 Token', 'error'); tokenModal.classList.add('active'); return; }
+        }
+        const post = postsData.find(p => p.filename === filename);
+        if (!post) return;
+        const newPinned = !post.pinned;
+        btn.disabled = true;
+        try {
+            const newContent = updatePinnedInContent(post.contentText, newPinned);
+            const url = `https://api.github.com/repos/${REPO}/contents/${POSTS_PATH}/${filename}`;
+            const res = await fetch(url, {
+                method: 'PUT',
+                headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: `${newPinned ? '置顶' : '取消置顶'}文章: ${filename}`, content: btoa(unescape(encodeURIComponent(newContent))), sha: sha, branch: 'main' })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                post.pinned = newPinned;
+                post.sha = data.content.sha;
+                post.contentText = newContent;
+                renderPosts(postsData);
+                showToast(newPinned ? '✅ 已置顶' : '✅ 已取消置顶');
+            } else {
+                const err = await res.json();
+                showToast(`❌ 操作失败：${err.message}`, 'error');
+                btn.disabled = false;
+            }
+        } catch (err) {
+            showToast(`❌ 网络错误：${err.message}`, 'error');
+            btn.disabled = false;
+        }
+    }
+
+    // 提取媒体路径（删除文章时清理）
     function extractMediaPaths(markdown) {
         const paths = [];
-        // 匹配图片
         const imgRegex = /!\[.*?\]\((.*?)\)/g;
         let m;
         while ((m = imgRegex.exec(markdown)) !== null) {
-            const url = m[1];
-            const path = extractRepoPath(url);
-            if (path) paths.push(path);
+            const path = extractRepoPath(m[1]); if (path) paths.push(path);
         }
-        // 匹配视频
         const vidRegex = /<video[^>]*src="([^"]*)"[^>]*>/g;
         while ((m = vidRegex.exec(markdown)) !== null) {
-            const url = m[1];
-            const path = extractRepoPath(url);
-            if (path) paths.push(path);
+            const path = extractRepoPath(m[1]); if (path) paths.push(path);
         }
-        return [...new Set(paths)]; // 去重
+        return [...new Set(paths)];
     }
-
     function extractRepoPath(url) {
-        // 处理 raw 和 jsDelivr 两种格式
-        if (url.includes('raw.githubusercontent.com/' + REPO + '/main/')) {
-            return url.split('raw.githubusercontent.com/' + REPO + '/main/')[1];
-        }
-        if (url.includes('cdn.jsdelivr.net/gh/' + REPO + '@main/')) {
-            return url.split('cdn.jsdelivr.net/gh/' + REPO + '@main/')[1];
-        }
-        // 处理 github.com 的 blob 路径（如果有）
-        if (url.includes('github.com/' + REPO + '/blob/main/')) {
-            return url.split('github.com/' + REPO + '/blob/main/')[1];
-        }
+        if (url.includes('raw.githubusercontent.com/' + REPO + '/main/')) return url.split('raw.githubusercontent.com/' + REPO + '/main/')[1];
+        if (url.includes('cdn.jsdelivr.net/gh/' + REPO + '@main/')) return url.split('cdn.jsdelivr.net/gh/' + REPO + '@main/')[1];
+        if (url.includes('github.com/' + REPO + '/blob/main/')) return url.split('github.com/' + REPO + '/blob/main/')[1];
         return null;
     }
 
-    // ========== 删除文章 + 关联媒体 ==========
     async function deletePost(btn) {
         const item = btn.closest('.post-item');
-        if (!item) return;
-
         const filename = item.dataset.filename;
         const sha = item.dataset.sha;
-
         if (!token) {
             const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved && saved.startsWith('ghp_')) {
-                token = saved;
-                tokenDot.className = 'dot active';
-                tokenLabel.textContent = '已配置';
-            } else {
-                showToast('⚠️ 请先配置 Token', 'error');
-                tokenModal.classList.add('active');
-                tokenInput.focus();
-                return;
-            }
+            if (saved && saved.startsWith('ghp_')) token = saved;
+            else { showToast('⚠️ 请先配置 Token', 'error'); tokenModal.classList.add('active'); return; }
         }
-
         if (!confirm(`确定要删除「${filename}」吗？\n文章中的图片/视频也会一并删除！`)) return;
-
         btn.disabled = true;
         btn.textContent = '⏳';
-
         try {
-            // 1. 获取文章内容，提取媒体路径
+            const post = postsData.find(p => p.filename === filename);
             let mediaPaths = [];
-            try {
-                const contentRes = await fetch(`https://raw.githubusercontent.com/${REPO}/main/posts/${encodeURIComponent(filename)}`);
-                if (contentRes.ok) {
-                    const text = await contentRes.text();
-                    mediaPaths = extractMediaPaths(text);
-                }
-            } catch (e) {
-                console.warn('获取文章内容失败，跳过媒体清理', e);
-            }
-
-            // 2. 删除文章文件
+            if (post) mediaPaths = extractMediaPaths(post.contentText);
             const deleteUrl = `https://api.github.com/repos/${REPO}/contents/${POSTS_PATH}/${filename}`;
             const res = await fetch(deleteUrl, {
                 method: 'DELETE',
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    message: `删除文章: ${filename}`,
-                    sha: sha,
-                    branch: 'main'
-                })
+                headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: `删除文章: ${filename}`, sha: sha, branch: 'main' })
             });
-
-            if (!res.ok) {
-                const err = await res.json();
-                showToast(`❌ 删除文章失败：${err.message || '未知错误'}`, 'error');
-                btn.disabled = false;
-                btn.textContent = '🗑️';
-                return;
-            }
-
-            // 3. 删除关联媒体文件（逐个删除，忽略失败）
-            let deletedMediaCount = 0;
+            if (!res.ok) { const err = await res.json(); showToast(`❌ 删除失败：${err.message}`, 'error'); btn.disabled = false; btn.textContent = '🗑️'; return; }
+            let deletedMedia = 0;
             for (const mediaPath of mediaPaths) {
                 try {
-                    // 获取媒体文件的 sha
-                    const mediaGetRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${mediaPath}`, {
-                        headers: { 'Authorization': `token ${token}` }
-                    });
-                    if (mediaGetRes.ok) {
-                        const mediaData = await mediaGetRes.json();
-                        const mediaDeleteRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${mediaPath}`, {
-                            method: 'DELETE',
-                            headers: {
-                                'Authorization': `token ${token}`,
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                message: `删除媒体: ${mediaPath}`,
-                                sha: mediaData.sha,
-                                branch: 'main'
-                            })
+                    const mRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${mediaPath}`, { headers: { 'Authorization': `token ${token}` } });
+                    if (mRes.ok) {
+                        const mData = await mRes.json();
+                        const dRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${mediaPath}`, {
+                            method: 'DELETE', headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ message: `删除媒体: ${mediaPath}`, sha: mData.sha, branch: 'main' })
                         });
-                        if (mediaDeleteRes.ok) deletedMediaCount++;
+                        if (dRes.ok) deletedMedia++;
                     }
-                } catch (e) {
-                    console.warn('删除媒体失败:', mediaPath, e);
-                }
+                } catch {}
             }
-
-            // 4. 从本地列表移除，不重新请求
             item.classList.add('deleting');
             setTimeout(() => {
                 postsData = postsData.filter(p => p.filename !== filename);
                 renderPosts(postsData);
-                const msg = deletedMediaCount > 0
-                    ? `✅ 已删除文章，并清理了 ${deletedMediaCount} 个媒体文件`
-                    : `✅ 已删除文章`;
-                showToast(msg);
+                showToast(deletedMedia > 0 ? `✅ 已删除文章，清理了 ${deletedMedia} 个媒体文件` : '✅ 已删除文章');
             }, 250);
-
         } catch (err) {
             showToast(`❌ 网络错误：${err.message}`, 'error');
             btn.disabled = false;
@@ -636,10 +491,8 @@
         }
     }
 
-    // ========== 初始化 ==========
     loadToken();
     loadPosts();
 </script>
-
 </body>
 </html>

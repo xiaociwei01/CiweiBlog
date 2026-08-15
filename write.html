@@ -3,459 +3,315 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>写新文章 · 小刺猬</title>
+    <title>写文章 / 编辑</title>
     <style>
         :root {
-            --primary: #1a1a2e;
-            --primary-hover: #2d2d4a;
-            --bg: #f5f7fa;
-            --card-bg: rgba(255, 255, 255, 0.85);
-            --card-border: rgba(255, 255, 255, 0.6);
-            --text: #1a1a2e;
-            --text-muted: #555;
-            --text-faint: #999;
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-            --radius: 16px;
-            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            --green: #22c55e;
-            --red: #ef4444;
+            --primary: #1a1a2e; --primary-hover: #2d2d4a; --bg: #f5f7fa;
+            --card-bg: rgba(255,255,255,0.85); --text: #1a1a2e; --text-muted: #555; --text-faint: #999;
+            --shadow: 0 8px 32px rgba(0,0,0,0.08); --radius: 16px; --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+            --green: #22c55e; --red: #ef4444;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin:0; padding:0; box-sizing:border-box; }
         body {
-            font-family: -apple-system, 'PingFang SC', 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            padding: 24px 16px 60px;
-            overflow-x: hidden;
+            font-family:-apple-system,'PingFang SC','Segoe UI',Roboto,sans-serif;
+            background:linear-gradient(135deg,#e0eafc 0%,#cfdef3 100%);
+            color:var(--text); min-height:100vh; display:flex; justify-content:center;
+            padding:24px 16px 60px; overflow-x:hidden;
         }
-        .container { width: 100%; max-width: 680px; }
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-            opacity: 0;
-            animation: fadeUp 0.5s ease forwards;
-        }
-        .header .title { font-size: 26px; font-weight: 700; letter-spacing: 0.5px; }
-        .header .back-link {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 14px;
-            background: rgba(255,255,255,0.6);
-            padding: 8px 16px;
-            border-radius: 30px;
-            transition: background var(--transition), transform var(--transition);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-        .header .back-link:hover { background: rgba(255,255,255,0.9); transform: translateX(-2px); }
+        .container { width:100%; max-width:680px; }
+        .header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; opacity:0; animation:fadeUp .5s ease forwards; }
+        .header .title { font-size:26px; font-weight:700; letter-spacing:.5px; }
+        .header .back-link { color:var(--text-muted); text-decoration:none; font-size:14px; background:rgba(255,255,255,0.6); padding:8px 16px; border-radius:30px; transition:background var(--transition),transform var(--transition); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
+        .header .back-link:hover { background:rgba(255,255,255,0.9); transform:translateX(-2px); }
         .write-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--card-border);
-            border-radius: var(--radius);
-            padding: 28px 24px;
-            box-shadow: var(--shadow);
-            margin-bottom: 20px;
-            opacity: 0;
-            animation: fadeUp 0.5s ease 0.1s forwards;
+            background:var(--card-bg); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+            border:1px solid rgba(255,255,255,0.6); border-radius:var(--radius); padding:28px 24px; box-shadow:var(--shadow);
+            margin-bottom:20px; opacity:0; animation:fadeUp .5s ease .1s forwards;
         }
-        .write-card label { display: block; font-weight: 600; font-size: 15px; margin-bottom: 8px; }
+        .write-card label { display:block; font-weight:600; font-size:15px; margin-bottom:8px; }
         .write-card input[type="text"], .write-card textarea {
-            width: 100%;
-            padding: 14px 16px;
-            border: 1px solid rgba(0,0,0,0.08);
-            border-radius: 12px;
-            font-size: 15px;
-            font-family: inherit;
-            background: rgba(255,255,255,0.7);
-            transition: border-color var(--transition), box-shadow var(--transition);
-            outline: none;
-            color: var(--text);
+            width:100%; padding:14px 16px; border:1px solid rgba(0,0,0,0.08); border-radius:12px; font-size:15px;
+            font-family:inherit; background:rgba(255,255,255,0.7); transition:border-color var(--transition),box-shadow var(--transition);
+            outline:none; color:var(--text);
         }
-        .write-card input[type="text"]:focus, .write-card textarea:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(26, 26, 46, 0.1);
-        }
-        .write-card textarea { min-height: 280px; resize: vertical; line-height: 1.6; }
-        .time-hint {
-            background: rgba(255,255,255,0.6);
-            border-radius: 12px;
-            padding: 12px 16px;
-            margin-top: 4px;
-            font-size: 14px;
-            color: var(--text-muted);
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-        .time-hint strong { color: var(--primary); font-weight: 600; }
+        .write-card input[type="text"]:focus, .write-card textarea:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(26,26,46,0.1); }
+        .write-card textarea { min-height:280px; resize:vertical; line-height:1.6; }
+        .time-hint { background:rgba(255,255,255,0.6); border-radius:12px; padding:12px 16px; margin-top:4px; font-size:14px; color:var(--text-muted); border:1px solid rgba(0,0,0,0.05); }
+        .time-hint strong { color:var(--primary); font-weight:600; }
         .upload-area {
-            border: 2px dashed rgba(26, 26, 46, 0.2);
-            border-radius: 16px;
-            padding: 28px 20px;
-            text-align: center;
-            color: var(--text-faint);
-            cursor: pointer;
-            transition: all var(--transition);
-            background: rgba(255,255,255,0.4);
-            margin: 12px 0;
-            position: relative;
+            border:2px dashed rgba(26,26,46,0.2); border-radius:16px; padding:28px 20px; text-align:center; color:var(--text-faint);
+            cursor:pointer; transition:all var(--transition); background:rgba(255,255,255,0.4); margin:12px 0;
         }
-        .upload-area:hover { border-color: var(--primary); background: rgba(255,255,255,0.7); transform: translateY(-2px); }
-        .upload-area.dragover { border-color: var(--primary); background: rgba(26, 26, 46, 0.05); transform: scale(1.01); }
-        .upload-area input[type="file"] { display: none; }
-        .upload-area .icon { font-size: 36px; margin-bottom: 8px; }
-        .upload-status { font-size: 13px; margin-top: 8px; color: var(--text-muted); min-height: 20px; }
-        .upload-status .success { color: var(--green); }
-        .upload-status .error { color: var(--red); }
-        .token-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-        .token-row input { flex: 1; min-width: 200px; background: rgba(255,255,255,0.6); }
-        .token-status { font-size: 14px; font-weight: 500; }
-        .token-status.success { color: var(--green); }
-        .token-status.error { color: var(--red); }
-        .forget-link { color: var(--text-faint); cursor: pointer; text-decoration: underline; margin-left: 8px; }
-        .forget-link:hover { color: var(--red); }
+        .upload-area:hover { border-color:var(--primary); background:rgba(255,255,255,0.7); transform:translateY(-2px); }
+        .upload-area.dragover { border-color:var(--primary); background:rgba(26,26,46,0.05); transform:scale(1.01); }
+        .upload-area input[type="file"] { display:none; }
+        .upload-area .icon { font-size:36px; margin-bottom:8px; }
+        .upload-status { font-size:13px; margin-top:8px; color:var(--text-muted); min-height:20px; }
+        .upload-status .success { color:var(--green); }
+        .upload-status .error { color:var(--red); }
+        .token-row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+        .token-row input { flex:1; min-width:200px; background:rgba(255,255,255,0.6); }
+        .token-status { font-size:14px; font-weight:500; }
+        .token-status.success { color:var(--green); }
+        .token-status.error { color:var(--red); }
+        .forget-link { color:var(--text-faint); cursor:pointer; text-decoration:underline; margin-left:8px; }
+        .forget-link:hover { color:var(--red); }
         .btn-publish {
-            width: 100%;
-            padding: 16px;
-            background: var(--primary);
-            color: #fff;
-            border: none;
-            border-radius: 40px;
-            font-size: 17px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all var(--transition);
-            margin-top: 20px;
-            letter-spacing: 0.5px;
-            position: relative;
-            overflow: hidden;
+            width:100%; padding:16px; background:var(--primary); color:#fff; border:none; border-radius:40px; font-size:17px;
+            font-weight:600; cursor:pointer; transition:all var(--transition); margin-top:20px; letter-spacing:.5px; position:relative; overflow:hidden;
         }
-        .btn-publish:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(26,26,46,0.25); }
-        .btn-publish:active { transform: scale(0.97); }
-        .btn-publish:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
-        .btn-publish .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-top-color: #fff;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            vertical-align: middle;
-            margin-right: 8px;
+        .btn-publish:hover { background:var(--primary-hover); transform:translateY(-2px); box-shadow:0 8px 24px rgba(26,26,46,0.25); }
+        .btn-publish:active { transform:scale(0.97); }
+        .btn-publish:disabled { opacity:0.6; cursor:not-allowed; transform:none; box-shadow:none; }
+        .btn-publish .spinner { display:inline-block; width:20px; height:20px; border:3px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin .8s linear infinite; vertical-align:middle; margin-right:8px; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .status-msg { margin-top:16px; font-size:14px; text-align:center; color:var(--text-muted); }
+        .status-msg.success { color:var(--green); }
+        .status-msg.error { color:var(--red); }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+        @media (max-width:480px) {
+            .write-card { padding:20px 16px; }
+            .header .title { font-size:22px; }
+            .upload-area { padding:20px 15px; }
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .status-msg { margin-top: 16px; font-size: 14px; text-align: center; color: var(--text-muted); }
-        .status-msg.success { color: var(--green); }
-        .status-msg.error { color: var(--red); }
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @media (max-width: 480px) {
-            .write-card { padding: 20px 16px; }
-            .header .title { font-size: 22px; }
-            .upload-area { padding: 20px 15px; }
-        }
-        .glass-note {
-            background: rgba(255,255,255,0.4);
-            border-radius: 12px;
-            padding: 10px 16px;
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-top: 8px;
-        }
+        .glass-note { background:rgba(255,255,255,0.4); border-radius:12px; padding:10px 16px; font-size:13px; color:var(--text-muted); margin-top:8px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <span class="title">✍️ 写新文章</span>
-            <a href="index.html" class="back-link">← 返回管理</a>
-        </div>
-
-        <div class="write-card">
-            <label>文章标题</label>
-            <input type="text" id="title" placeholder="给文章起个标题...">
-
-            <div style="margin-top: 16px;">
-                <label>📅 发布时间</label>
-                <div class="time-hint">⏱️ 将自动记录为：<strong id="timeDisplay">加载中...</strong></div>
-            </div>
-
-            <div style="margin-top: 16px;">
-                <label>标签（用逗号分隔）</label>
-                <input type="text" id="tags" placeholder="日记, 生活">
-            </div>
-
-            <div style="margin-top: 16px;">
-                <label>正文（Markdown 格式）</label>
-                <textarea id="body" placeholder="写点什么...&#10;&#10;支持 Markdown 语法，图片和视频可通过下方上传自动插入。"></textarea>
-            </div>
-
-            <div style="margin-top: 16px;">
-                <label>📎 上传图片或视频</label>
-                <div class="upload-area" id="uploadArea">
-                    <div class="icon">📤</div>
-                    <div>点击选择文件 或 拖拽到这里</div>
-                    <div style="font-size:12px;color:#aaa;margin-top:4px;">支持 jpg, png, gif, webp, mp4, mov, webm（单文件 ≤ 100MB）</div>
-                    <input type="file" id="fileInput" accept="image/*,video/*" multiple>
-                </div>
-                <div id="uploadStatus" class="upload-status">等待上传...</div>
-            </div>
-
-            <div style="margin-top: 16px;">
-                <label>🔑 GitHub Token</label>
-                <div class="token-row">
-                    <input type="password" id="tokenInput" placeholder="ghp_xxxxx（输入后自动保存）">
-                    <span id="tokenStatus" class="token-status"></span>
-                </div>
-                <div class="glass-note">Token 仅保存在你的浏览器 localStorage 中，用于发布文章和上传文件。</div>
-            </div>
-
-            <button class="btn-publish" id="publishBtn">🚀 发布文章</button>
-            <div id="statusMsg" class="status-msg"></div>
-        </div>
+<div class="container">
+    <div class="header">
+        <span class="title" id="pageTitle">✍️ 写新文章</span>
+        <a href="index.html" class="back-link">← 返回管理</a>
     </div>
 
-    <script>
-        const REPO = 'xiaociwei01/CiweiBlog';
-        const STORAGE_KEY = 'ciwei_blog_token';
-        const CACHE_KEY = 'ciwei_blog_posts_cache';
+    <div class="write-card">
+        <label>文章标题</label>
+        <input type="text" id="title" placeholder="给文章起个标题...">
 
-        function getCurrentTime() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            return {
-                dateStr: `${year}-${month}-${day}`,
-                timeStr: `${hours}:${minutes}`,
-                fullStr: `${year}-${month}-${day} ${hours}:${minutes}`,
-                filenamePrefix: `${year}-${month}-${day}-${hours}${minutes}`
-            };
+        <div style="margin-top:16px;">
+            <label>📅 发布时间</label>
+            <div class="time-hint">⏱️ 将自动记录为：<strong id="timeDisplay">加载中...</strong></div>
+        </div>
+
+        <div style="margin-top:16px;">
+            <label>标签（用逗号分隔）</label>
+            <input type="text" id="tags" placeholder="日记, 生活">
+        </div>
+
+        <div style="margin-top:16px;">
+            <label>正文（Markdown 格式）</label>
+            <textarea id="body" placeholder="写点什么..."></textarea>
+        </div>
+
+        <div style="margin-top:16px;">
+            <label>📎 上传图片或视频</label>
+            <div class="upload-area" id="uploadArea">
+                <div class="icon">📤</div>
+                <div>点击选择文件 或 拖拽到这里</div>
+                <div style="font-size:12px;color:#aaa;margin-top:4px;">支持 jpg, png, gif, webp, mp4, mov, webm（单文件 ≤ 100MB）</div>
+                <input type="file" id="fileInput" accept="image/*,video/*" multiple>
+            </div>
+            <div id="uploadStatus" class="upload-status">等待上传...</div>
+        </div>
+
+        <div style="margin-top:16px;">
+            <label>🔑 GitHub Token</label>
+            <div class="token-row">
+                <input type="password" id="tokenInput" placeholder="ghp_xxxxx（输入后自动保存）">
+                <span id="tokenStatus" class="token-status"></span>
+            </div>
+            <div class="glass-note">Token 仅保存在你的浏览器 localStorage 中，用于发布/修改文章和上传文件。</div>
+        </div>
+
+        <button class="btn-publish" id="publishBtn">🚀 发布文章</button>
+        <div id="statusMsg" class="status-msg"></div>
+    </div>
+</div>
+
+<script>
+    const REPO = 'xiaociwei01/CiweiBlog';
+    const STORAGE_KEY = 'ciwei_blog_token';
+    const CACHE_KEY = 'ciwei_blog_posts_cache';
+
+    let token = '';
+    let editingFilename = null;
+    let editingSha = '';
+    let originalDate = '';
+    let originalPinned = false;
+
+    function getCurrentTime() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth()+1).padStart(2,'0');
+        const day = String(now.getDate()).padStart(2,'0');
+        const hours = String(now.getHours()).padStart(2,'0');
+        const minutes = String(now.getMinutes()).padStart(2,'0');
+        return {
+            dateStr:`${year}-${month}-${day}`,
+            timeStr:`${hours}:${minutes}`,
+            fullStr:`${year}-${month}-${day} ${hours}:${minutes}`,
+            filenamePrefix:`${year}-${month}-${day}-${hours}${minutes}`
+        };
+    }
+
+    function updateTimeDisplay() { document.getElementById('timeDisplay').textContent = getCurrentTime().fullStr; }
+    updateTimeDisplay(); setInterval(updateTimeDisplay, 60000);
+
+    function loadSavedToken() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) { token = saved; document.getElementById('tokenInput').value = saved; setTokenStatus(true); return true; }
+        setTokenStatus(false); return false;
+    }
+    function setTokenStatus(ok) {
+        const el = document.getElementById('tokenStatus');
+        if (ok) { el.innerHTML = '✅ 已保存 <span class="forget-link" onclick="forgetToken()">忘记</span>'; el.className='token-status success'; }
+        else { el.textContent=''; el.className='token-status'; }
+    }
+    function saveToken(t) {
+        if (t && t.startsWith('ghp_')) { localStorage.setItem(STORAGE_KEY,t); token=t; setTokenStatus(true); return true; }
+        else if (!t) { forgetToken(); return false; }
+        else { document.getElementById('tokenStatus').textContent='⚠️ 格式错误，应以 ghp_ 开头'; document.getElementById('tokenStatus').className='token-status error'; return false; }
+    }
+    function forgetToken() { localStorage.removeItem(STORAGE_KEY); token=''; document.getElementById('tokenInput').value=''; setTokenStatus(false); }
+    document.getElementById('tokenInput').addEventListener('input', function(){ const val=this.value.trim(); if(val) saveToken(val); else forgetToken(); });
+
+    const uploadArea=document.getElementById('uploadArea'), fileInput=document.getElementById('fileInput'), uploadStatus=document.getElementById('uploadStatus');
+    uploadArea.addEventListener('click',()=>fileInput.click());
+    uploadArea.addEventListener('dragover',e=>{e.preventDefault();uploadArea.classList.add('dragover');});
+    uploadArea.addEventListener('dragleave',()=>uploadArea.classList.remove('dragover'));
+    uploadArea.addEventListener('drop',e=>{e.preventDefault();uploadArea.classList.remove('dragover'); if(e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);});
+    fileInput.addEventListener('change',e=>{ if(e.target.files.length) handleFiles(e.target.files); });
+
+    function readFileAsBase64(file){ return new Promise((resolve,reject)=>{ const reader=new FileReader(); reader.onload=()=>resolve(reader.result); reader.onerror=reject; reader.readAsDataURL(file); }); }
+
+    async function handleFiles(files){
+        let currentToken=token||localStorage.getItem(STORAGE_KEY);
+        if(!currentToken){ uploadStatus.innerHTML='<span class="error">⚠️ 请先输入 GitHub Token</span>'; document.getElementById('tokenInput').focus(); return; }
+        for(const file of files){
+            if(file.size>100*1024*1024){ uploadStatus.innerHTML=`<span class="error">❌ ${file.name} 超过 100MB</span>`; continue; }
+            uploadStatus.innerHTML=`⏳ 正在上传 ${file.name} ...`;
+            try{
+                const base64=await readFileAsBase64(file);
+                const now=new Date(); const year=now.getFullYear(); const month=String(now.getMonth()+1).padStart(2,'0');
+                const ext=file.name.split('.').pop().toLowerCase();
+                const baseName=file.name.replace(/\.[^.]+$/,'').replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g,'-')||'file';
+                const filename=`${baseName}-${Date.now()}.${ext}`;
+                const path=`images/${year}/${month}/${filename}`;
+                const url=`https://api.github.com/repos/${REPO}/contents/${path}`;
+                const res=await fetch(url,{ method:'PUT', headers:{'Authorization':`token ${currentToken}`,'Content-Type':'application/json'}, body:JSON.stringify({message:`上传文件: ${file.name}`,content:base64.split(',')[1],branch:'main'}) });
+                if(res.ok){
+                    const cdnUrl=`https://cdn.jsdelivr.net/gh/${REPO}@main/${path}`;
+                    const isVideo=file.type.startsWith('video/');
+                    const markdown=isVideo?`<video controls src="${cdnUrl}" preload="metadata" style="max-width:100%;border-radius:8px;"></video>`:`![](${cdnUrl})`;
+                    const bodyTextarea=document.getElementById('body');
+                    const cursorPos=bodyTextarea.selectionStart||bodyTextarea.value.length;
+                    bodyTextarea.value=bodyTextarea.value.substring(0,cursorPos)+markdown+'\n\n'+bodyTextarea.value.substring(cursorPos);
+                    uploadStatus.innerHTML=`<span class="success">✅ ${file.name} 上传成功，已插入正文</span>`;
+                }else{ const err=await res.json(); uploadStatus.innerHTML=`<span class="error">❌ 上传失败：${err.message||'未知错误'}</span>`; }
+            }catch(err){ uploadStatus.innerHTML=`<span class="error">❌ 上传失败：${err.message}</span>`; }
         }
+    }
 
-        function updateTimeDisplay() {
-            document.getElementById('timeDisplay').textContent = getCurrentTime().fullStr;
-        }
-        updateTimeDisplay();
-        setInterval(updateTimeDisplay, 60000);
-
-        let token = '';
-        function loadSavedToken() {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                token = saved;
-                document.getElementById('tokenInput').value = saved;
-                setTokenStatus(true);
-                return true;
-            }
-            setTokenStatus(false);
-            return false;
-        }
-        function setTokenStatus(ok) {
-            const el = document.getElementById('tokenStatus');
-            if (ok) {
-                el.innerHTML = '✅ 已保存 <span class="forget-link" onclick="forgetToken()">忘记</span>';
-                el.className = 'token-status success';
-            } else {
-                el.textContent = '';
-                el.className = 'token-status';
-            }
-        }
-        function saveToken(t) {
-            if (t && t.startsWith('ghp_')) {
-                localStorage.setItem(STORAGE_KEY, t);
-                token = t;
-                setTokenStatus(true);
-                return true;
-            } else if (!t) {
-                forgetToken();
-                return false;
-            } else {
-                const statusEl = document.getElementById('tokenStatus');
-                statusEl.textContent = '⚠️ 格式错误，应以 ghp_ 开头';
-                statusEl.className = 'token-status error';
-                return false;
-            }
-        }
-        function forgetToken() {
-            localStorage.removeItem(STORAGE_KEY);
-            token = '';
-            document.getElementById('tokenInput').value = '';
-            setTokenStatus(false);
-        }
-        document.getElementById('tokenInput').addEventListener('input', function() {
-            const val = this.value.trim();
-            if (val) saveToken(val);
-            else forgetToken();
-        });
-
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('fileInput');
-        const uploadStatus = document.getElementById('uploadStatus');
-        uploadArea.addEventListener('click', () => fileInput.click());
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('dragover');
-        });
-        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('dragover');
-            if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
-        });
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length) handleFiles(e.target.files);
-        });
-
-        function readFileAsBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
-
-        async function handleFiles(files) {
-            let currentToken = token || localStorage.getItem(STORAGE_KEY);
-            if (!currentToken) {
-                uploadStatus.innerHTML = '<span class="error">⚠️ 请先输入 GitHub Token</span>';
-                document.getElementById('tokenInput').focus();
-                return;
-            }
-            for (const file of files) {
-                if (file.size > 100 * 1024 * 1024) {
-                    uploadStatus.innerHTML = `<span class="error">❌ ${file.name} 超过 100MB，无法上传</span>`;
-                    continue;
-                }
-                uploadStatus.innerHTML = `⏳ 正在上传 ${file.name} ...`;
-                try {
-                    const base64 = await readFileAsBase64(file);
-                    const now = new Date();
-                    const year = now.getFullYear();
-                    const month = String(now.getMonth() + 1).padStart(2, '0');
-                    const ext = file.name.split('.').pop().toLowerCase();
-                    const baseName = file.name.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '-');
-                    const safeName = baseName || 'file';
-                    const filename = `${safeName}-${Date.now()}.${ext}`;
-                    const path = `images/${year}/${month}/${filename}`;
-
-                    const url = `https://api.github.com/repos/${REPO}/contents/${path}`;
-                    const payload = {
-                        message: `上传文件: ${file.name}`,
-                        content: base64.split(',')[1],
-                        branch: 'main'
-                    };
-                    const res = await fetch(url, {
-                        method: 'PUT',
-                        headers: {
-                            'Authorization': `token ${currentToken}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(payload)
-                    });
-                    if (res.ok) {
-                        // 使用 jsDelivr CDN 地址，加载更快
-                        const cdnUrl = `https://cdn.jsdelivr.net/gh/${REPO}@main/${path}`;
-                        const isVideo = file.type.startsWith('video/');
-                        const markdown = isVideo
-                            ? `<video controls src="${cdnUrl}" preload="metadata" style="max-width:100%;border-radius:8px;"></video>`
-                            : `![](${cdnUrl})`;
-                        const bodyTextarea = document.getElementById('body');
-                        const cursorPos = bodyTextarea.selectionStart || bodyTextarea.value.length;
-                        const before = bodyTextarea.value.substring(0, cursorPos);
-                        const after = bodyTextarea.value.substring(cursorPos);
-                        bodyTextarea.value = before + markdown + '\n\n' + after;
-                        bodyTextarea.dispatchEvent(new Event('input'));
-                        uploadStatus.innerHTML = `<span class="success">✅ ${file.name} 上传成功，已插入正文（使用 CDN 加速）</span>`;
-                    } else {
-                        const err = await res.json();
-                        uploadStatus.innerHTML = `<span class="error">❌ ${file.name} 上传失败：${err.message || '未知错误'}</span>`;
-                    }
-                } catch (err) {
-                    uploadStatus.innerHTML = `<span class="error">❌ ${file.name} 上传失败：${err.message}</span>`;
-                }
-            }
-        }
-
-        document.getElementById('publishBtn').addEventListener('click', async function() {
-            const title = document.getElementById('title').value.trim();
-            const tags = document.getElementById('tags').value.trim();
-            const body = document.getElementById('body').value.trim();
-
-            let currentToken = token || localStorage.getItem(STORAGE_KEY);
-            if (!currentToken) {
-                document.getElementById('statusMsg').innerHTML = '<span class="error">⚠️ 请先输入 GitHub Token</span>';
-                document.getElementById('tokenInput').focus();
-                return;
-            }
-            if (!title || !body) {
-                document.getElementById('statusMsg').innerHTML = '<span class="error">⚠️ 标题和正文不能为空</span>';
-                return;
-            }
-
-            const time = getCurrentTime();
-            const fullStr = time.fullStr;
-            const filenamePrefix = time.filenamePrefix;
-            const timestamp = Date.now();
-            const filename = `${filenamePrefix}-${timestamp}.md`;
-
-            const content = `---\ntitle: ${title}\ndate: ${fullStr}\ntags: ${tags}\n---\n\n${body}`;
-
-            const url = `https://api.github.com/repos/${REPO}/contents/posts/${filename}`;
-            const btn = document.getElementById('publishBtn');
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span> 发布中...';
-
-            try {
-                const payload = {
-                    message: `添加文章: ${title}`,
-                    content: btoa(unescape(encodeURIComponent(content))),
-                    branch: 'main'
-                };
-
-                const res = await fetch(url, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${currentToken}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
+    // 解析 frontmatter
+    function parseFrontmatter(contentText){
+        const lines=contentText.split('\n');
+        const meta={title:'',date:'',tags:'',pinned:false,modified:''};
+        let bodyStart=0;
+        if(lines[0]==='---'){
+            const end=lines.indexOf('---',1);
+            if(end!==-1){
+                lines.slice(1,end).forEach(line=>{
+                    if(line.startsWith('title:')) meta.title=line.replace('title:','').trim();
+                    if(line.startsWith('date:')) meta.date=line.replace('date:','').trim();
+                    if(line.startsWith('tags:')) meta.tags=line.replace('tags:','').trim();
+                    if(line.startsWith('pinned:')) meta.pinned=line.replace('pinned:','').trim()==='true';
+                    if(line.startsWith('modified:')) meta.modified=line.replace('modified:','').trim();
                 });
-
-                if (res.ok) {
-                    localStorage.removeItem(CACHE_KEY);
-                    document.getElementById('statusMsg').innerHTML = `
-                        <span class="success">✅ 发布成功！发布时间：${fullStr}</span>
-                        <br><a href="index.html" style="color: var(--primary); font-weight: 500;">点击返回后台查看</a>
-                    `;
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                } else {
-                    const err = await res.json();
-                    document.getElementById('statusMsg').innerHTML = `<span class="error">❌ 发布失败：${err.message || '未知错误'}</span>`;
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                }
-            } catch (err) {
-                document.getElementById('statusMsg').innerHTML = `<span class="error">❌ 网络错误：${err.message}</span>`;
-                btn.innerHTML = originalText;
-                btn.disabled = false;
+                bodyStart=end+1;
             }
-        });
+        }
+        meta.body=lines.slice(bodyStart).join('\n').trim();
+        return meta;
+    }
 
-        loadSavedToken();
-    </script>
+    // 编辑模式：加载已有文章
+    async function loadPostForEdit(filename){
+        try{
+            const apiUrl=`https://api.github.com/repos/${REPO}/contents/posts/${encodeURIComponent(filename)}`;
+            const res=await fetch(apiUrl,{headers:token?{'Authorization':`token ${token}`}:{}});
+            if(!res.ok) throw new Error('文章不存在或无法读取');
+            const data=await res.json();
+            const contentText=decodeURIComponent(escape(atob(data.content.replace(/\n/g,''))));
+            const meta=parseFrontmatter(contentText);
+            document.getElementById('title').value=meta.title;
+            document.getElementById('tags').value=meta.tags;
+            document.getElementById('body').value=meta.body;
+            editingFilename=filename;
+            editingSha=data.sha;
+            originalDate=meta.date;
+            originalPinned=meta.pinned;
+            document.getElementById('pageTitle').textContent='✏️ 编辑文章';
+            document.getElementById('publishBtn').textContent='💾 更新文章';
+            document.getElementById('timeDisplay').textContent='原发布时间：'+(meta.date||'未知');
+        }catch(err){
+            document.getElementById('statusMsg').innerHTML=`<span class="error">❌ 加载文章失败：${err.message}</span>`;
+        }
+    }
+
+    document.getElementById('publishBtn').addEventListener('click', async function(){
+        const title=document.getElementById('title').value.trim();
+        const tags=document.getElementById('tags').value.trim();
+        const body=document.getElementById('body').value.trim();
+        let currentToken=token||localStorage.getItem(STORAGE_KEY);
+        if(!currentToken){ document.getElementById('statusMsg').innerHTML='<span class="error">⚠️ 请先输入 GitHub Token</span>'; document.getElementById('tokenInput').focus(); return; }
+        if(!title||!body){ document.getElementById('statusMsg').innerHTML='<span class="error">⚠️ 标题和正文不能为空</span>'; return; }
+
+        const time=getCurrentTime();
+        const fullStr=time.fullStr;
+        const btn=document.getElementById('publishBtn');
+        const originalText=btn.innerHTML;
+        btn.disabled=true;
+        btn.innerHTML='<span class="spinner"></span> '+(editingFilename?'更新中...':'发布中...');
+
+        let filename=editingFilename;
+        let sha=editingSha;
+        let date=editingFilename?originalDate:fullStr;
+        let pinned=editingFilename?originalPinned:false;
+
+        // 构建 frontmatter 和内容
+        let frontmatter=`---\ntitle: ${title}\ndate: ${date}\ntags: ${tags}`;
+        if(pinned) frontmatter+=`\npinned: true`;
+        if(editingFilename) frontmatter+=`\nmodified: ${fullStr}`;
+        frontmatter+=`\n---\n\n${body}`;
+
+        try{
+            if(!filename){
+                filename=`${time.filenamePrefix}-${Date.now()}.md`;
+            }
+            const url=`https://api.github.com/repos/${REPO}/contents/posts/${filename}`;
+            const payload={ message: editingFilename?`修改文章: ${title}`:`添加文章: ${title}`, content:btoa(unescape(encodeURIComponent(frontmatter))), branch:'main' };
+            if(sha) payload.sha=sha;
+            const res=await fetch(url,{ method:'PUT', headers:{'Authorization':`token ${currentToken}`,'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+            if(res.ok){
+                localStorage.removeItem(CACHE_KEY);
+                document.getElementById('statusMsg').innerHTML=`<span class="success">✅ ${editingFilename?'更新成功':'发布成功'}！</span><br><a href="index.html" style="color:var(--primary);font-weight:500;">点击返回后台查看</a>`;
+                btn.innerHTML=originalText; btn.disabled=false;
+                if(editingFilename){ loadPostForEdit(filename); } else { document.getElementById('title').value=''; document.getElementById('tags').value=''; document.getElementById('body').value=''; }
+            }else{
+                const err=await res.json(); document.getElementById('statusMsg').innerHTML=`<span class="error">❌ 失败：${err.message||'未知错误'}</span>`;
+                btn.innerHTML=originalText; btn.disabled=false;
+            }
+        }catch(err){
+            document.getElementById('statusMsg').innerHTML=`<span class="error">❌ 网络错误：${err.message}</span>`;
+            btn.innerHTML=originalText; btn.disabled=false;
+        }
+    });
+
+    // 初始化
+    loadSavedToken();
+    const urlParams=new URLSearchParams(window.location.search);
+    const editFile=urlParams.get('file');
+    if(editFile){ loadPostForEdit(editFile); }
+</script>
 </body>
 </html>
