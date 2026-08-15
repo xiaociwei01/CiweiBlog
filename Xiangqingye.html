@@ -238,8 +238,69 @@
             font-weight: 700;
             margin-bottom: 14px;
         }
+
+        /* ===== Cusdis 布局优化 ===== */
         #cusdis_thread {
             min-height: 100px;
+        }
+
+        /* 给 Cusdis 渲染后的容器加 flex 布局，调整顺序 */
+        #cusdis_thread .cusdis-thread {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 评论列表排在上面 */
+        #cusdis_thread .cusdis-comments {
+            order: 1;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+
+        /* 输入框排在下面 */
+        #cusdis_thread .cusdis-input {
+            order: 2;
+            background: #fafbfc;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #e8ecf0;
+        }
+
+        /* 输入框里的昵称输入框样式 */
+        #cusdis_thread input[type="text"],
+        #cusdis_thread input[type="email"],
+        #cusdis_thread input[type="url"],
+        #cusdis_thread textarea {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        #cusdis_thread input:focus,
+        #cusdis_thread textarea:focus {
+            border-color: #1a1a2e;
+        }
+
+        /* 提交按钮样式 */
+        #cusdis_thread button[type="submit"] {
+            background: #1a1a2e;
+            color: #ffffff;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        #cusdis_thread button[type="submit"]:hover {
+            background: #2d2d4a;
         }
 
         @media (max-width: 480px) {
@@ -249,6 +310,7 @@
             .detail-images.single img { max-height: 280px; }
             .detail-videos.single video { max-height: 280px; }
             .like-section, .comment-section { padding: 16px 14px; }
+            #cusdis_thread .cusdis-input { padding: 12px; }
         }
     </style>
 </head>
@@ -292,7 +354,9 @@
         const NICKNAME = '小刺猬';
         const LIKE_API = 'https://api.countapi.xyz';
         // ⚠️ 替换成你在 Cusdis 后台拿到的 app-id
-        const CUSDIS_APP_ID = 'ac50fafc-701b-4b4e-82c9-7e76f0f882c2';
+        const CUSDIS_APP_ID = '你的cusdis-app-id';
+        // 记住昵称的 localStorage key
+        const NICKNAME_KEY = 'cusdis_nickname';
 
         function getUrlParam(name) {
             const params = new URLSearchParams(window.location.search);
@@ -509,6 +573,79 @@
             script.async = true;
             script.defer = true;
             document.body.appendChild(script);
+
+            // 监听 Cusdis 渲染完成，执行布局调整和昵称记忆
+            const observer = new MutationObserver(() => {
+                adjustCusdisLayout();
+                setupNicknameMemory();
+            });
+
+            observer.observe(thread, { childList: true, subtree: true });
+
+            // 脚本加载完成后先执行一次
+            setTimeout(() => {
+                adjustCusdisLayout();
+                setupNicknameMemory();
+            }, 2000);
+        }
+
+        // ========== 调整 Cusdis 布局：评论在上，输入框在下 ==========
+        function adjustCusdisLayout() {
+            const thread = document.getElementById('cusdis_thread');
+
+            // 查找评论列表和输入框（兼容不同 Cusdis 版本的 class 名）
+            const commentList = thread.querySelector('.cusdis-comments') ||
+                                thread.querySelector('[class*="comment-list"]') ||
+                                thread.querySelector('[class*="comments"]');
+
+            const inputArea = thread.querySelector('.cusdis-input') ||
+                              thread.querySelector('[class*="input-area"]') ||
+                              thread.querySelector('form') ||
+                              thread.querySelector('[class*="form"]');
+
+            if (commentList && inputArea) {
+                // 确保输入框在评论列表后面
+                if (commentList.compareDocumentPosition(inputArea) & Node.DOCUMENT_POSITION_FOLLOWING) {
+                    // commentList 已经在 inputArea 前面，不用调整
+                } else {
+                    // 需要把 commentList 移到 inputArea 后面
+                    inputArea.parentNode.insertBefore(commentList, inputArea);
+                }
+            }
+        }
+
+        // ========== 记住昵称 ==========
+        function setupNicknameMemory() {
+            const thread = document.getElementById('cusdis_thread');
+
+            // 查找昵称输入框（通常是第一个 input，Cusdis 的昵称字段是 input[name="nickname"] 或类似）
+            const nicknameInput = thread.querySelector('input[name="nickname"]') ||
+                                  thread.querySelector('input[placeholder*="昵称"]') ||
+                                  thread.querySelector('input[placeholder*="名字"]') ||
+                                  thread.querySelector('input[placeholder*="name"]') ||
+                                  thread.querySelector('input[type="text"]');
+
+            if (!nicknameInput) return;
+
+            // 如果已经有保存的昵称，自动填充
+            const savedNickname = localStorage.getItem(NICKNAME_KEY);
+            if (savedNickname) {
+                nicknameInput.value = savedNickname;
+                // 触发 input 事件，让 Cusdis 框架感知到值变化
+                nicknameInput.dispatchEvent(new Event('input', { bubbles: true }));
+                nicknameInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+
+            // 监听输入变化，实时保存昵称
+            nicknameInput.addEventListener('input', function() {
+                const value = this.value.trim();
+                if (value) {
+                    localStorage.setItem(NICKNAME_KEY, value);
+                }
+            });
+
+            // 标记已处理，避免重复绑定
+            nicknameInput.dataset.nicknameMemorySetup = 'true';
         }
 
         function openImgModal(event, src) {
