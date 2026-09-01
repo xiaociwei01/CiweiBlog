@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>写文章 / 编辑</title>
+    <title>写文章 / 编辑 </title>
     <style>
         :root {
             --primary: #1a1a2e; --primary-hover: #2d2d4a; --bg: #f5f7fa;
@@ -212,7 +212,6 @@
         }
     }
 
-    // 解析 frontmatter
     function parseFrontmatter(contentText){
         const lines=contentText.split('\n');
         const meta={title:'',date:'',tags:'',pinned:false,modified:''};
@@ -234,7 +233,6 @@
         return meta;
     }
 
-    // 编辑模式：加载已有文章
     async function loadPostForEdit(filename){
         try{
             const apiUrl=`https://api.github.com/repos/${REPO}/contents/posts/${encodeURIComponent(filename)}`;
@@ -258,6 +256,68 @@
         }
     }
 
+    function buildMediaUrl(url){
+        if(!url) return '';
+        if(url.includes('cdn.jsdelivr.net')) return url;
+        if(url.includes('raw.githubusercontent.com/'+REPO+'/main/')){ const path=url.split('raw.githubusercontent.com/'+REPO+'/main/')[1]; return `https://cdn.jsdelivr.net/gh/${REPO}@main/${path}`; }
+        if(url.includes('github.com/'+REPO+'/blob/main/')){ const path=url.split('github.com/'+REPO+'/blob/main/')[1]; return `https://cdn.jsdelivr.net/gh/${REPO}@main/${path}`; }
+        if(!url.startsWith('http://')&&!url.startsWith('https://')) return `https://cdn.jsdelivr.net/gh/${REPO}@main/${url.replace(/^\.?\//,'')}`;
+        return url;
+    }
+
+    function parsePostToIndexItem(contentText, filename){
+        const meta=parseFrontmatter(contentText);
+        const images=[...meta.body.matchAll(/!\[.*?\]\((.*?)\)/g)].map(m=>buildMediaUrl(m[1]));
+        const videos=[...meta.body.matchAll(/<video[^>]*src="([^"]*)"[^>]*>/g)].map(m=>buildMediaUrl(m[1]));
+        let textBody=meta.body.replace(/!\[.*?\]\(.*?\)/g,'').replace(/<video[^>]*>.*?<\/video>/g,'').replace(/\n{3,}/g,'\n\n').trim();
+        return {
+            filename,
+            title: meta.title || filename.replace('.md',''),
+            date: meta.date || '未知日期',
+            tags: meta.tags.split(',').map(t=>t.trim()).filter(t=>t),
+            body: textBody,
+            images,
+            videos,
+            pinned: meta.pinned,
+            modified: meta.modified
+        };
+    }
+
+    async function rebuildIndex(){
+        const currentToken=token||localStorage.getItem(STORAGE_KEY);
+        if(!currentToken) return;
+        try{
+            const indexPath='posts/index.json';
+            const indexUrl=`https://api.github.com/repos/${REPO}/contents/${indexPath}`;
+            let sha='';
+            try{
+                const getRes=await fetch(indexUrl,{headers:{'Authorization':`token ${currentToken}`}});
+                if(getRes.ok){ const data=await getRes.json(); sha=data.sha; }
+            }catch(e){}
+
+            const postsRes=await fetch(`https://api.github.com/repos/${REPO}/contents/posts`,{headers:{'Authorization':`token ${currentToken}`}});
+            if(!postsRes.ok) return;
+            const files=await postsRes.json();
+            const mdFiles=files.filter(f=>f.name.endsWith('.md'));
+            const tasks=mdFiles.map(async post=>{
+                try{
+                    const contentRes=await fetch(post.download_url);
+                    if(!contentRes.ok) return null;
+                    const contentText=await contentRes.text();
+                    return parsePostToIndexItem(contentText, post.name);
+                }catch{return null;}
+            });
+            const results=await Promise.all(tasks);
+            const index=results.filter(p=>p!==null);
+            index.sort((a,b)=>{ if(a.pinned&&!b.pinned) return -1; if(!a.pinned&&b.pinned) return 1; return (b.filename||'').localeCompare(a.filename||''); });
+            const content=JSON.stringify(index,null,2);
+            const payload={message:`更新索引: ${new Date().toLocaleString()}`,content:btoa(unescape(encodeURIComponent(content))),branch:'main'};
+            if(sha) payload.sha=sha;
+            await fetch(indexUrl,{method:'PUT',headers:{'Authorization':`token ${currentToken}`,'Content-Type':'application/json'},body:JSON.stringify(payload)});
+            console.log('✅ 索引已更新');
+        }catch(err){ console.warn('重建索引失败',err); }
+    }
+
     document.getElementById('publishBtn').addEventListener('click', async function(){
         const title=document.getElementById('title').value.trim();
         const tags=document.getElementById('tags').value.trim();
@@ -278,25 +338,25 @@
         let date=editingFilename?originalDate:fullStr;
         let pinned=editingFilename?originalPinned:false;
 
-        // 构建 frontmatter 和内容
         let frontmatter=`---\ntitle: ${title}\ndate: ${date}\ntags: ${tags}`;
         if(pinned) frontmatter+=`\npinned: true`;
         if(editingFilename) frontmatter+=`\nmodified: ${fullStr}`;
         frontmatter+=`\n---\n\n${body}`;
 
         try{
-            if(!filename){
-                filename=`${time.filenamePrefix}-${Date.now()}.md`;
-            }
+            if(!filename){ filename=`${time.filenamePrefix}-${Date.now()}.md`; }
             const url=`https://api.github.com/repos/${REPO}/contents/posts/${filename}`;
             const payload={ message: editingFilename?`修改文章: ${title}`:`添加文章: ${title}`, content:btoa(unescape(encodeURIComponent(frontmatter))), branch:'main' };
             if(sha) payload.sha=sha;
             const res=await fetch(url,{ method:'PUT', headers:{'Authorization':`token ${currentToken}`,'Content-Type':'application/json'}, body:JSON.stringify(payload) });
             if(res.ok){
                 localStorage.removeItem(CACHE_KEY);
-                document.getElementById('statusMsg').innerHTML=`<span class="success">✅ ${editingFilename?'更新成功':'发布成功'}！</span><br><a href="index.html" style="color:var(--primary);font-weight:500;">点击返回后台查看</a>`;
+                // 自动重建索引
+                await rebuildIndex();
+                document.getElementById('statusMsg').innerHTML=`<span class="success">✅ ${editingFilename?'更新成功':'发布成功'}！索引已同步</span><br><a href="index.html" style="color:var(--primary);font-weight:500;">点击返回后台查看</a>`;
                 btn.innerHTML=originalText; btn.disabled=false;
-                if(editingFilename){ loadPostForEdit(filename); } else { document.getElementById('title').value=''; document.getElementById('tags').value=''; document.getElementById('body').value=''; }
+                if(!editingFilename){ document.getElementById('title').value=''; document.getElementById('tags').value=''; document.getElementById('body').value=''; }
+                else { loadPostForEdit(filename); }
             }else{
                 const err=await res.json(); document.getElementById('statusMsg').innerHTML=`<span class="error">❌ 失败：${err.message||'未知错误'}</span>`;
                 btn.innerHTML=originalText; btn.disabled=false;
@@ -307,7 +367,6 @@
         }
     });
 
-    // 初始化
     loadSavedToken();
     const urlParams=new URLSearchParams(window.location.search);
     const editFile=urlParams.get('file');
