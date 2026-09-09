@@ -27,6 +27,7 @@
             --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.08);
             --radius-lg: 20px;
             --radius-md: 14px;
+            --radius-sm: 10px;
             --transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             --transition-spring: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
             --accent: #58a6ff;
@@ -300,11 +301,14 @@
             margin: 6px 0;
         }
 
-        /* ===== 图片网格 ===== */
+        /* ================================================================
+           图片网格（和 FriendQuan 样式一致）
+        ================================================================ */
         .detail-images {
             display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 4px;
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-sm);
             overflow: hidden;
             margin-top: 6px;
         }
@@ -312,38 +316,32 @@
             grid-template-columns: 1fr;
             gap: 0;
         }
-        .detail-images.single img {
+        .detail-images.two {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .detail-images img {
             width: 100%;
-            max-height: 500px;
+            aspect-ratio: 1 / 1;
             object-fit: contain;
             display: block;
             background: var(--bg-body);
             border-radius: var(--radius-sm);
             cursor: pointer;
+            transition: transform var(--transition-base);
         }
-        .detail-images.multi {
-            grid-template-columns: repeat(3, 1fr);
-            grid-auto-rows: 1fr;
-        }
-        .detail-images.multi.two {
-            grid-template-columns: repeat(2, 1fr);
-        }
-        .detail-images.multi img {
-            width: 100%;
-            height: 100%;
-            aspect-ratio: 1/1;
-            object-fit: cover;
-            display: block;
-            background: var(--bg-body);
-            cursor: pointer;
-            border-radius: var(--radius-sm);
+        .detail-images img:hover {
+            transform: scale(1.02);
         }
 
-        /* ===== 视频网格 ===== */
+        /* ================================================================
+           视频网格（和 FriendQuan 样式一致）
+        ================================================================ */
         .detail-videos {
             display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 4px;
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-sm);
             overflow: hidden;
             margin-top: 6px;
             background: #000;
@@ -352,25 +350,21 @@
             grid-template-columns: 1fr;
             gap: 0;
         }
-        .detail-videos.single video {
-            width: 100%;
-            max-height: 500px;
-            display: block;
-            border-radius: var(--radius-sm);
-            background: #000;
+        .detail-videos.two {
+            grid-template-columns: 1fr 1fr;
         }
-        .detail-videos.multi {
-            grid-template-columns: repeat(3, 1fr);
-            grid-auto-rows: 1fr;
-        }
-        .detail-videos.multi video {
+
+        .detail-videos video {
             width: 100%;
-            height: 100%;
-            aspect-ratio: 1/1;
+            aspect-ratio: 1 / 1;
             object-fit: cover;
             display: block;
             background: #000;
             border-radius: var(--radius-sm);
+            transition: transform var(--transition-base);
+        }
+        .detail-videos video:hover {
+            transform: scale(1.02);
         }
 
         /* ===== 标签 ===== */
@@ -549,11 +543,11 @@
             .detail-body {
                 font-size: 15px;
             }
-            .detail-images.single img {
-                max-height: 280px;
+            .detail-images {
+                gap: 3px;
             }
-            .detail-videos.single video {
-                max-height: 280px;
+            .detail-videos {
+                gap: 3px;
             }
             .comment-section {
                 padding: 16px 14px;
@@ -639,7 +633,7 @@
         const BLOG_REPO = 'xiaociwei01/CiweiBlog';
         const THEME_KEY = 'ciwei_home_theme';
         const AVATAR_URL = 'https://xiaociwei01.github.io/CiweiHome/ciweitouxiang.jpg';
-        const NICKNAME = 'LouFoong';
+        const NICKNAME = '小刺猬';
         const CUSDIS_APP_ID = 'ac50fafc-701b-4b4e-82c9-7e76f0f882c2';
         const NICKNAME_KEY = 'cusdis_nickname';
 
@@ -680,27 +674,27 @@
         }
 
         function renderMarkdown(text) {
-    if (!text) return '';
+            if (!text) return '';
 
-    // 先转义所有 HTML 标签（让 <br> <dr> 等显示为纯文本）
-    let html = text
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+            // 先转义所有 HTML 标签（让 <br> <dr> 等显示为纯文本）
+            let html = text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
 
-    // 再处理 Markdown 语法
-    html = html
-        .replace(/!\[.*?\]\((.*?)\)/g, (match, url) => {
-            const fullUrl = buildCdnUrl(url);
-            return `<img src="${fullUrl}" alt="图片" loading="lazy" onclick="openImgModal(this.src)" />`;
-        })
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\n/g, '<br />');
+            // 再处理 Markdown 语法
+            html = html
+                .replace(/!\[.*?\]\((.*?)\)/g, (match, url) => {
+                    const fullUrl = buildCdnUrl(url);
+                    return `<img src="${fullUrl}" alt="图片" loading="lazy" onclick="openImgModal(this.src)" />`;
+                })
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n/g, '<br />');
 
-    return html;
-}
+            return html;
+        }
 
         function getUrlParam(name) {
             const params = new URLSearchParams(window.location.search);
@@ -838,18 +832,34 @@
                 // ===== 渲染 =====
                 const bodyHtml = textBody ? `<div class="detail-body">${renderMarkdown(textBody)}</div>` : '';
 
+                // ===== 图片网格（和 FriendQuan 样式一致） =====
                 let imagesHtml = '';
                 if (images.length > 0) {
-                    const cls = images.length === 1 ? 'single' : (images.length === 2 ? 'multi two' : 'multi');
-                    imagesHtml =
-                        `<div class="detail-images ${cls}">${images.map(url => `<img src="${url}" alt="图片" loading="lazy" onclick="openImgModal(this.src)" />`).join('')}</div>`;
+                    const count = images.length;
+                    let gridClass = 'single';
+                    if (count === 2) gridClass = 'two';
+                    else if (count >= 3) gridClass = '';
+
+                    imagesHtml = `
+                        <div class="detail-images ${gridClass}">
+                            ${images.map(url => `<img src="${url}" alt="图片" loading="lazy" onclick="openImgModal(this.src)" />`).join('')}
+                        </div>
+                    `;
                 }
 
+                // ===== 视频网格（和 FriendQuan 样式一致） =====
                 let videosHtml = '';
                 if (videos.length > 0) {
-                    const cls = videos.length === 1 ? 'single' : (videos.length === 2 ? 'multi two' : 'multi');
-                    videosHtml =
-                        `<div class="detail-videos ${cls}">${videos.map(url => `<video controls src="${url}" preload="metadata" playsinline></video>`).join('')}</div>`;
+                    const count = videos.length;
+                    let gridClass = 'single';
+                    if (count === 2) gridClass = 'two';
+                    else if (count >= 3) gridClass = '';
+
+                    videosHtml = `
+                        <div class="detail-videos ${gridClass}">
+                            ${videos.map(url => `<video controls src="${url}" preload="metadata" playsinline></video>`).join('')}
+                        </div>
+                    `;
                 }
 
                 const tagsArray = tags.split(',').map(t => t.trim()).filter(t => t);
@@ -1060,8 +1070,9 @@
         // ================================================================
         loadPost();
 
-        console.log('🦔 Xiangqingye 已启动（风格统一版）');
+        console.log('🦔 Xiangqingye 已启动（图片样式与FriendQuan统一）');
         console.log('📦 博客仓库:', BLOG_REPO);
     </script>
 
-</body>/html>
+</body>
+</html>
