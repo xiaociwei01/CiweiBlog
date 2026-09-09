@@ -291,6 +291,119 @@
             box-shadow: 0 4px 16px rgba(239, 68, 68, 0.25);
         }
 
+        /* ================================================================
+           平台管理面板
+        ================================================================ */
+        .platform-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 18px 22px 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-card);
+            transition: all var(--transition-spring);
+        }
+        .platform-panel:hover {
+            border-color: var(--accent);
+            box-shadow: var(--shadow-hover);
+        }
+        .platform-panel .panel-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .platform-panel .panel-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+        }
+        .platform-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .platform-row:last-child {
+            border-bottom: none;
+        }
+        .platform-row .platform-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .platform-row .platform-info .platform-icon {
+            font-size: 18px;
+        }
+        .platform-row .platform-info .platform-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        .platform-row .platform-info .platform-status {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-left: 4px;
+        }
+        .platform-row .platform-info .platform-status.on {
+            color: var(--success);
+        }
+        .platform-row .platform-info .platform-status.off {
+            color: var(--danger);
+        }
+
+        /* 开关样式 */
+        .switch-toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+            cursor: pointer;
+            border-radius: 12px;
+            background: var(--bg-toggle-off, #d0d5dd);
+            transition: background var(--transition-base);
+            border: none;
+            padding: 0;
+        }
+        .switch-toggle.on {
+            background: var(--bg-toggle-on, rgba(88, 166, 255, 0.5));
+        }
+        [data-theme="dark"] .switch-toggle {
+            --bg-toggle-off: rgba(255, 255, 255, 0.2);
+            --bg-toggle-on: rgba(88, 166, 255, 0.4);
+        }
+        .switch-toggle .switch-knob {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #fff;
+            transition: transform var(--transition-base), background var(--transition-base);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+        }
+        .switch-toggle.on .switch-knob {
+            transform: translateX(20px);
+            background: #fff;
+        }
+
+        .platform-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+
         /* ===== 文章列表 ===== */
         .post-list {
             display: flex;
@@ -604,6 +717,19 @@
             .token-status-bar .token-label-text {
                 display: none;
             }
+            .platform-panel {
+                padding: 14px 16px 16px;
+            }
+            .platform-row {
+                flex-wrap: wrap;
+            }
+            .platform-actions {
+                flex-wrap: wrap;
+            }
+            .platform-actions .btn {
+                flex: 1;
+                justify-content: center;
+            }
         }
 
         @media (max-width: 400px) {
@@ -665,6 +791,44 @@
             <span class="action-right" id="lastUpdateTime"></span>
         </div>
 
+        <!-- ============================================================ -->
+        <!-- ===== 平台管理面板（新增） ===== -->
+        <!-- ============================================================ -->
+        <div class="platform-panel">
+            <div class="panel-title">🌐 平台管理</div>
+            <div class="panel-desc">控制主站显示的跳转平台，关闭后对应的链接和按钮将隐藏</div>
+
+            <!-- Netlify -->
+            <div class="platform-row">
+                <div class="platform-info">
+                    <span class="platform-icon">🚀</span>
+                    <span class="platform-name">Netlify</span>
+                    <span class="platform-status" id="netlifyStatus">已启用</span>
+                </div>
+                <button class="switch-toggle on" id="netlifySwitch" onclick="togglePlatform('netlify')">
+                    <span class="switch-knob"></span>
+                </button>
+            </div>
+
+            <!-- GitHub Pages -->
+            <div class="platform-row">
+                <div class="platform-info">
+                    <span class="platform-icon">🐙</span>
+                    <span class="platform-name">GitHub Pages</span>
+                    <span class="platform-status" id="githubStatus">已启用</span>
+                </div>
+                <button class="switch-toggle on" id="githubSwitch" onclick="togglePlatform('github')">
+                    <span class="switch-knob"></span>
+                </button>
+            </div>
+
+            <div class="platform-actions">
+                <button class="btn btn-primary btn-sm" onclick="savePlatformConfig()">💾 保存平台设置</button>
+                <button class="btn btn-outline btn-sm" onclick="loadPlatformConfig()">🔄 刷新状态</button>
+                <span style="font-size:12px;color:var(--text-muted);margin-left:auto;" id="platformStatusText">未保存</span>
+            </div>
+        </div>
+
         <!-- ===== 文章列表 ===== -->
         <div id="postList" class="post-list">
             <div class="loading-state">
@@ -703,9 +867,11 @@
         const THEME_KEY = 'ciwei_blog_theme';
         const DETAIL_PAGE = 'Xiangqingye.html';
         const EDIT_PAGE = 'write.html';
+        const PLATFORM_FILE = 'platform.json';
 
         let token = '';
         let postsData = [];
+        let platformConfig = { netlify: true, github: true };
 
         // ================================================================
         // DOM 引用
@@ -779,11 +945,13 @@
                 tokenDot.className = 'dot active';
                 tokenLabel.textContent = '已配置';
                 tokenHint.textContent = '✅ Token 已配置';
+                return true;
             } else {
                 token = '';
                 tokenDot.className = 'dot inactive';
                 tokenLabel.textContent = '未配置';
                 tokenHint.textContent = '⚠️ 请配置 Token 以删除/置顶/编辑文章';
+                return false;
             }
         }
 
@@ -798,6 +966,7 @@
                 showToast('✅ Token 已保存');
                 tokenModal.classList.remove('active');
                 loadPosts();
+                loadPlatformConfig();
             } else if (!val) {
                 clearToken();
             } else {
@@ -827,6 +996,143 @@
         tokenInput.addEventListener('keydown', e => {
             if (e.key === 'Enter') saveTokenAndClose();
         });
+
+        // ================================================================
+        // 平台管理（新增）
+        // ================================================================
+        function updatePlatformUI() {
+            const netlifySwitch = $('netlifySwitch');
+            const githubSwitch = $('githubSwitch');
+            const netlifyStatus = $('netlifyStatus');
+            const githubStatus = $('githubStatus');
+
+            if (platformConfig.netlify) {
+                netlifySwitch.classList.add('on');
+                netlifyStatus.textContent = '已启用';
+                netlifyStatus.className = 'platform-status on';
+            } else {
+                netlifySwitch.classList.remove('on');
+                netlifyStatus.textContent = '已禁用';
+                netlifyStatus.className = 'platform-status off';
+            }
+
+            if (platformConfig.github) {
+                githubSwitch.classList.add('on');
+                githubStatus.textContent = '已启用';
+                githubStatus.className = 'platform-status on';
+            } else {
+                githubSwitch.classList.remove('on');
+                githubStatus.textContent = '已禁用';
+                githubStatus.className = 'platform-status off';
+            }
+        }
+
+        function togglePlatform(platform) {
+            platformConfig[platform] = !platformConfig[platform];
+            updatePlatformUI();
+            $('platformStatusText').textContent = '⚠️ 未保存';
+            $('platformStatusText').style.color = 'var(--warning)';
+        }
+
+        async function loadPlatformConfig() {
+            const currentToken = token || localStorage.getItem(STORAGE_KEY);
+            if (!currentToken) {
+                showToast('⚠️ 请先配置 Token', 'error');
+                tokenModal.classList.add('active');
+                return;
+            }
+
+            try {
+                const url = `https://api.github.com/repos/${REPO}/contents/${PLATFORM_FILE}`;
+                const res = await fetch(url, {
+                    headers: { 'Authorization': `token ${currentToken}` }
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    const content = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
+                    const config = JSON.parse(content);
+                    platformConfig.netlify = config.netlify !== undefined ? config.netlify : true;
+                    platformConfig.github = config.github !== undefined ? config.github : true;
+                    updatePlatformUI();
+                    $('platformStatusText').textContent = '✅ 已加载';
+                    $('platformStatusText').style.color = 'var(--success)';
+                    showToast('✅ 平台配置已加载');
+                } else if (res.status === 404) {
+                    // 文件不存在，创建默认配置
+                    platformConfig = { netlify: true, github: true };
+                    updatePlatformUI();
+                    $('platformStatusText').textContent = '⚠️ 使用默认配置';
+                    $('platformStatusText').style.color = 'var(--warning)';
+                    await savePlatformConfig();
+                } else {
+                    throw new Error('加载失败');
+                }
+            } catch (err) {
+                showToast('❌ 加载平台配置失败', 'error');
+                console.warn('加载 platform.json 失败:', err);
+            }
+        }
+
+        async function savePlatformConfig() {
+            const currentToken = token || localStorage.getItem(STORAGE_KEY);
+            if (!currentToken) {
+                showToast('⚠️ 请先配置 Token', 'error');
+                tokenModal.classList.add('active');
+                return;
+            }
+
+            const btn = document.querySelector('.platform-actions .btn-primary');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '⏳ 保存中...';
+
+            try {
+                const content = JSON.stringify(platformConfig, null, 2);
+                const url = `https://api.github.com/repos/${REPO}/contents/${PLATFORM_FILE}`;
+
+                let sha = '';
+                try {
+                    const getRes = await fetch(url, {
+                        headers: { 'Authorization': `token ${currentToken}` }
+                    });
+                    if (getRes.ok) {
+                        const data = await getRes.json();
+                        sha = data.sha;
+                    }
+                } catch (e) {}
+
+                const payload = {
+                    message: `更新平台配置: Netlify=${platformConfig.netlify}, GitHub=${platformConfig.github}`,
+                    content: btoa(unescape(encodeURIComponent(content))),
+                    branch: 'main'
+                };
+                if (sha) payload.sha = sha;
+
+                const res = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${currentToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.message || '保存失败');
+                }
+
+                $('platformStatusText').textContent = '✅ 已保存';
+                $('platformStatusText').style.color = 'var(--success)';
+                showToast('✅ 平台配置已保存');
+            } catch (err) {
+                showToast('❌ 保存失败：' + err.message, 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
 
         // ================================================================
         // 核心功能（原版逻辑，完全保留）
@@ -1119,22 +1425,22 @@
         }
 
         function parsePostToIndexItem(contentText, filename) {
-    const meta = parseFrontmatter(contentText);
-    const images = [...meta.body.matchAll(/!\[.*?\]\((.*?)\)/g)].map(m => buildMediaUrl(m[1]));
-    const videos = [...meta.body.matchAll(/<video[^>]*src="([^"]*)"[^>]*>/g)].map(m => buildMediaUrl(m[1]));
-    let textBody = meta.body.replace(/!\[.*?\]\(.*?\)/g, '').replace(/<video[^>]*>.*?<\/video>/g, '').replace(/\n{3,}/g, '\n\n').trim();
-    return {
-        filename,
-        title: meta.title || filename.replace('.md', ''),
-        date: meta.date || '未知日期',
-        tags: meta.tags.split(',').map(t => t.trim()).filter(t => t),
-        body: textBody,
-        images,
-        videos,
-        pinned: meta.pinned,      // 👈 加上这一行
-        modified: meta.modified
-    };
-}
+            const meta = parseFrontmatter(contentText);
+            const images = [...meta.body.matchAll(/!\[.*?\]\((.*?)\)/g)].map(m => buildMediaUrl(m[1]));
+            const videos = [...meta.body.matchAll(/<video[^>]*src="([^"]*)"[^>]*>/g)].map(m => buildMediaUrl(m[1]));
+            let textBody = meta.body.replace(/!\[.*?\]\(.*?\)/g, '').replace(/<video[^>]*>.*?<\/video>/g, '').replace(/\n{3,}/g, '\n\n').trim();
+            return {
+                filename,
+                title: meta.title || filename.replace('.md', ''),
+                date: meta.date || '未知日期',
+                tags: meta.tags.split(',').map(t => t.trim()).filter(t => t),
+                body: textBody,
+                images,
+                videos,
+                pinned: meta.pinned,
+                modified: meta.modified
+            };
+        }
 
         async function rebuildIndex() {
             if (!token) {
@@ -1187,8 +1493,18 @@
                     headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                if (putRes.ok) showToast('✅ 索引已重建');
-                else showToast('❌ 索引重建失败', 'error');
+                if (putRes.ok) {
+                    showToast('✅ 索引已重建');
+                    // 重建索引后自动清除 CDN 缓存（可选）
+                    try {
+                        await fetch(`https://purge.jsdelivr.net/gh/${REPO}@main/posts/index.json`);
+                        console.log('✅ CDN 缓存已清除');
+                    } catch (e) {
+                        console.warn('CDN 清除失败，但不影响使用', e);
+                    }
+                } else {
+                    showToast('❌ 索引重建失败', 'error');
+                }
             } catch (err) {
                 showToast(`❌ 索引重建失败：${err.message}`, 'error');
             }
@@ -1199,8 +1515,9 @@
         // ================================================================
         loadToken();
         loadPosts();
+        loadPlatformConfig();
 
-        console.log('🦔 文章管理后台已启动（深色玻璃拟态版）');
+        console.log('🦔 文章管理后台已启动（深色玻璃拟态版 + 平台管理）');
         console.log('📦 仓库:', REPO);
     </script>
 
