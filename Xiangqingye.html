@@ -4,45 +4,121 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>文章详情</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-body: #f5f6fa;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f0f2f5;
+            --text-primary: #1a1a2e;
+            --text-secondary: #555;
+            --text-muted: #999;
+            --border-color: #e8ecf0;
+            --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.04);
+            --radius-md: 14px;
+            --radius-lg: 18px;
+            --transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #0a0a0f;
+            --bg-card: rgba(255, 255, 255, 0.06);
+            --bg-card-hover: rgba(255, 255, 255, 0.10);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.75);
+            --text-muted: rgba(255, 255, 255, 0.4);
+            --border-color: rgba(255, 255, 255, 0.06);
+            --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: -apple-system, 'PingFang SC', 'Segoe UI', Roboto, sans-serif;
-            background: #f5f6fa;
-            color: #1a1a2e;
+            font-family: 'Inter', -apple-system, 'PingFang SC', 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-primary);
             padding: 20px 16px 60px;
             max-width: 720px;
             margin: 0 auto;
             min-height: 100vh;
+            transition: background 0.5s ease, color 0.5s ease;
         }
+
         .nav-bar {
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
             padding: 8px 0 16px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-color);
             margin-bottom: 20px;
+            transition: border-color 0.5s ease;
         }
-        .nav-bar .nav-title { font-size: 18px; font-weight: 700; color: #1a1a2e; }
+        .nav-bar .back-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: 30px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            transition: all var(--transition-base);
+        }
+        .nav-bar .back-link:hover {
+            background: var(--bg-card-hover);
+            border-color: #58a6ff;
+        }
+        .nav-bar .nav-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            transition: color 0.5s ease;
+        }
         .nav-bar .nav-title .sub {
             font-size: 12px;
             font-weight: 400;
-            color: #aaa;
+            color: var(--text-muted);
             display: block;
             margin-top: 2px;
         }
-        .detail-container {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-            border: 1px solid #f0f0f0;
-            margin-bottom: 16px;
+        .nav-bar .theme-toggle {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            padding: 6px 14px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-secondary);
+            transition: all var(--transition-base);
+            font-family: inherit;
         }
+        .nav-bar .theme-toggle:hover {
+            background: var(--bg-card-hover);
+            border-color: #58a6ff;
+        }
+
+        .detail-container {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 24px 22px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-color);
+            margin-bottom: 16px;
+            transition: all 0.5s ease;
+        }
+
         .detail-header {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 14px;
         }
         .detail-header .avatar {
@@ -58,16 +134,32 @@
             height: 100%;
             object-fit: cover;
         }
-        .detail-header .info { flex: 1; min-width: 0; }
-        .detail-header .info .name { font-size: 15px; font-weight: 600; color: #1a1a2e; }
-        .detail-header .info .time { font-size: 12px; color: #bbb; margin-top: 1px; }
+        .detail-header .info {
+            flex: 1;
+            min-width: 0;
+        }
+        .detail-header .info .name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            transition: color 0.5s ease;
+        }
+        .detail-header .info .time {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 1px;
+            transition: color 0.5s ease;
+        }
+
         .detail-title {
             font-size: 22px;
             font-weight: 700;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             line-height: 1.4;
-            color: #1a1a2e;
+            color: var(--text-primary);
+            transition: color 0.5s ease;
         }
+
         .detail-badges {
             display: flex;
             flex-wrap: wrap;
@@ -90,15 +182,33 @@
             font-size: 13px;
             font-weight: 600;
         }
+        [data-theme="dark"] .badge-pin {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+        }
+        [data-theme="dark"] .badge-modified {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+        }
+
         .detail-body {
             font-size: 16px;
             line-height: 1.8;
-            color: #333;
+            color: var(--text-secondary);
             white-space: pre-wrap;
             word-break: break-word;
             margin-bottom: 14px;
+            transition: color 0.5s ease;
         }
-        .detail-body:empty { display: none; }
+        .detail-body:empty {
+            display: none;
+        }
+        .detail-body img {
+            max-width: 100%;
+            border-radius: 10px;
+            margin: 6px 0;
+        }
+
         .detail-images {
             display: grid;
             gap: 4px;
@@ -106,28 +216,37 @@
             overflow: hidden;
             margin-top: 6px;
         }
-        .detail-images.single { grid-template-columns: 1fr; gap: 0; }
+        .detail-images.single {
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
         .detail-images.single img {
             width: 100%;
             max-height: 500px;
             object-fit: contain;
             display: block;
-            background: #f0f2f5;
+            background: var(--bg-body);
             border-radius: 8px;
             cursor: pointer;
         }
-        .detail-images.multi { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 1fr; }
-        .detail-images.multi.two { grid-template-columns: repeat(2, 1fr); }
+        .detail-images.multi {
+            grid-template-columns: repeat(3, 1fr);
+            grid-auto-rows: 1fr;
+        }
+        .detail-images.multi.two {
+            grid-template-columns: repeat(2, 1fr);
+        }
         .detail-images.multi img {
             width: 100%;
             height: 100%;
             aspect-ratio: 1/1;
             object-fit: cover;
             display: block;
-            background: #f0f2f5;
+            background: var(--bg-body);
             cursor: pointer;
             border-radius: 4px;
         }
+
         .detail-videos {
             display: grid;
             gap: 4px;
@@ -136,7 +255,10 @@
             margin-top: 6px;
             background: #000;
         }
-        .detail-videos.single { grid-template-columns: 1fr; gap: 0; }
+        .detail-videos.single {
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
         .detail-videos.single video {
             width: 100%;
             max-height: 500px;
@@ -144,7 +266,10 @@
             border-radius: 8px;
             background: #000;
         }
-        .detail-videos.multi { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 1fr; }
+        .detail-videos.multi {
+            grid-template-columns: repeat(3, 1fr);
+            grid-auto-rows: 1fr;
+        }
         .detail-videos.multi video {
             width: 100%;
             height: 100%;
@@ -154,6 +279,7 @@
             background: #000;
             border-radius: 4px;
         }
+
         .detail-tags {
             margin-top: 14px;
             display: flex;
@@ -161,29 +287,109 @@
             gap: 4px;
         }
         .detail-tags .tag {
-            background: #f0f2f5;
-            padding: 2px 10px;
+            background: var(--bg-body);
+            padding: 2px 12px;
             border-radius: 12px;
             font-size: 12px;
-            color: #888;
+            color: var(--text-muted);
+            transition: all 0.5s ease;
         }
-        .loading-state, .error-state {
+
+        .loading-state,
+        .error-state {
             text-align: center;
             padding: 60px 20px;
-            color: #ccc;
+            color: var(--text-muted);
         }
         .loading-state .spinner {
             display: inline-block;
             width: 28px;
             height: 28px;
-            border: 3px solid #eee;
-            border-top: 3px solid #1a1a2e;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid #58a6ff;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
             margin-bottom: 12px;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .error-state { color: #d14a4a; }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .error-state {
+            color: #ef4444;
+        }
+
+        .comment-section {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 20px 22px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-color);
+            transition: all 0.5s ease;
+        }
+        .comment-section .comment-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            color: var(--text-primary);
+            transition: color 0.5s ease;
+        }
+
+        #cusdis_thread {
+            min-height: 100px;
+        }
+
+        #cusdis_thread .cusdis-thread {
+            display: flex;
+            flex-direction: column;
+        }
+        #cusdis_thread .cusdis-comments {
+            order: 1;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+        #cusdis_thread .cusdis-input {
+            order: 2;
+            background: var(--bg-body);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        #cusdis_thread input[type="text"],
+        #cusdis_thread input[type="email"],
+        #cusdis_thread input[type="url"],
+        #cusdis_thread textarea {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+            color: var(--text-primary);
+            width: 100%;
+        }
+        #cusdis_thread input:focus,
+        #cusdis_thread textarea:focus {
+            border-color: #58a6ff;
+        }
+        #cusdis_thread button[type="submit"] {
+            background: #58a6ff;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #cusdis_thread button[type="submit"]:hover {
+            background: #4a8edb;
+        }
+
         .img-modal {
             display: none;
             position: fixed;
@@ -191,14 +397,16 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.92);
+            background: rgba(0, 0, 0, 0.92);
             z-index: 9999;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             padding: 20px;
         }
-        .img-modal.active { display: flex; }
+        .img-modal.active {
+            display: flex;
+        }
         .img-modal img {
             max-width: 95%;
             max-height: 92%;
@@ -210,95 +418,54 @@
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            color: rgba(255,255,255,0.3);
+            color: rgba(255, 255, 255, 0.3);
             font-size: 13px;
         }
 
-        /* ===== 评论区 ===== */
-        .comment-section {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-            border: 1px solid #f0f0f0;
-        }
-        .comment-section .comment-title {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 14px;
-            color: #1a1a2e;
-        }
-
-        /* ===== Cusdis 布局优化 ===== */
-        #cusdis_thread {
-            min-height: 100px;
-        }
-        #cusdis_thread .cusdis-thread {
-            display: flex;
-            flex-direction: column;
-        }
-        #cusdis_thread .cusdis-comments {
-            order: 1;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px dashed #e5e7eb;
-        }
-        #cusdis_thread .cusdis-input {
-            order: 2;
-            background: #fafbfc;
-            padding: 16px;
-            border-radius: 12px;
-            border: 1px solid #e8ecf0;
-        }
-        #cusdis_thread input[type="text"],
-        #cusdis_thread input[type="email"],
-        #cusdis_thread input[type="url"],
-        #cusdis_thread textarea {
-            background: #ffffff;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 10px 12px;
-            font-size: 14px;
-            font-family: inherit;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        #cusdis_thread input:focus,
-        #cusdis_thread textarea:focus {
-            border-color: #1a1a2e;
-        }
-        #cusdis_thread button[type="submit"] {
-            background: #1a1a2e;
-            color: #ffffff;
-            border: none;
-            border-radius: 20px;
-            padding: 8px 20px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        #cusdis_thread button[type="submit"]:hover {
-            background: #2d2d4a;
-        }
-
         @media (max-width: 480px) {
-            .detail-container { padding: 16px 14px; }
-            .detail-title { font-size: 19px; }
-            .detail-body { font-size: 15px; }
-            .detail-images.single img { max-height: 280px; }
-            .detail-videos.single video { max-height: 280px; }
-            .comment-section { padding: 16px 14px; }
-            #cusdis_thread .cusdis-input { padding: 12px; }
+            .detail-container {
+                padding: 16px 14px;
+            }
+            .detail-title {
+                font-size: 19px;
+            }
+            .detail-body {
+                font-size: 15px;
+            }
+            .detail-images.single img {
+                max-height: 280px;
+            }
+            .detail-videos.single video {
+                max-height: 280px;
+            }
+            .comment-section {
+                padding: 16px 14px;
+            }
+            #cusdis_thread .cusdis-input {
+                padding: 12px;
+            }
+            .nav-bar .nav-title {
+                font-size: 15px;
+            }
+            .nav-bar .back-link {
+                font-size: 12px;
+                padding: 4px 10px;
+            }
         }
     </style>
 </head>
 <body>
 
     <nav class="nav-bar">
+        <a class="back-link" href="index.html">← 返回</a>
         <div class="nav-title">
             📄 文章详情
             <span class="sub" id="detailSub">加载中...</span>
         </div>
+        <button class="theme-toggle" id="themeToggle">
+            <span id="themeIcon">🌙</span>
+            <span class="theme-label" id="themeLabel">深色</span>
+        </button>
     </nav>
 
     <div id="detailContent" class="detail-container">
@@ -308,7 +475,6 @@
         </div>
     </div>
 
-    <!-- 评论区 -->
     <div class="comment-section" id="commentSection" style="display:none;">
         <div class="comment-title">💬 评论</div>
         <div id="cusdis_thread"></div>
@@ -320,76 +486,259 @@
     </div>
 
     <script>
+        // ================================================================
+        // 配置
+        // ================================================================
+        const MANAGER_REPO = 'xiaociwei01/CiweiManager';
+        const CONFIG_PATH = 'config.json';
         const BLOG_REPO = 'xiaociwei01/CiweiBlog';
+        const THEME_KEY = 'ciwei_home_theme';
         const AVATAR_URL = 'https://xiaociwei01.github.io/CiweiHome/ciweitouxiang.jpg';
         const NICKNAME = '小刺猬';
-        // ⚠️ 替换成你在 Cusdis 后台拿到的 app-id
         const CUSDIS_APP_ID = 'ac50fafc-701b-4b4e-82c9-7e76f0f882c2';
         const NICKNAME_KEY = 'cusdis_nickname';
+        const DEFAULT_AVATAR = 'ciweitouxiang.jpg';
+
+        const $ = id => document.getElementById(id);
+
+        // ================================================================
+        // 工具函数
+        // ================================================================
+        function buildCdnUrl(path) {
+            if (!path) return '';
+            if (path.startsWith('http://') || path.startsWith('https://')) return path;
+            const localImages = ['ciweitouxiang.jpg'];
+            if (localImages.includes(path)) {
+                return `https://xiaociwei01.github.io/CiweiHome/${path}`;
+            }
+            return `https://cdn.jsdelivr.net/gh/${MANAGER_REPO}@main/${path}`;
+        }
+
+        function formatDateToMinute(dateStr) {
+            if (!dateStr) return '未知日期';
+            try {
+                const d = new Date(dateStr);
+                if (isNaN(d.getTime())) return dateStr;
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                const h = String(d.getHours()).padStart(2, '0');
+                const min = String(d.getMinutes()).padStart(2, '0');
+                return `${y}-${m}-${day} ${h}:${min}`;
+            } catch {
+                return dateStr;
+            }
+        }
+
+        function renderMarkdown(text) {
+            if (!text) return '';
+            let html = text
+                .replace(/!\[.*?\]\((.*?)\)/g, (match, url) => {
+                    const fullUrl = buildCdnUrl(url);
+                    return `<img src="${fullUrl}" alt="图片" loading="lazy" onclick="openImgModal(this.src)" />`;
+                })
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n/g, '<br />');
+            return html;
+        }
 
         function getUrlParam(name) {
             const params = new URLSearchParams(window.location.search);
             return params.get(name);
         }
 
-        function buildMediaUrl(url) {
-            if (!url) return '';
-            if (url.includes('cdn.jsdelivr.net')) return url;
-            if (url.includes('raw.githubusercontent.com/' + BLOG_REPO + '/main/')) {
-                const path = url.split('raw.githubusercontent.com/' + BLOG_REPO + '/main/')[1];
-                return `https://cdn.jsdelivr.net/gh/${BLOG_REPO}@main/${path}`;
-            }
-            if (url.includes('github.com/' + BLOG_REPO + '/blob/main/')) {
-                const path = url.split('github.com/' + BLOG_REPO + '/blob/main/')[1];
-                return `https://cdn.jsdelivr.net/gh/${BLOG_REPO}@main/${path}`;
-            }
-            if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                const clean = url.replace(/^\.?\//, '');
-                return `https://cdn.jsdelivr.net/gh/${BLOG_REPO}@main/${clean}`;
-            }
-            return url;
+        // ================================================================
+        // 主题
+        // ================================================================
+        function getPreferredTheme() {
+            const saved = localStorage.getItem(THEME_KEY);
+            if (saved === 'dark' || saved === 'light') return saved;
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }
 
-        function renderImages(images) {
-            if (!images || images.length === 0) return '';
-            if (images.length === 1) {
-                return `<div class="detail-images single"><img src="${images[0]}" alt="图片" onclick="openImgModal(event, this.src)" loading="lazy"></div>`;
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem(THEME_KEY, theme);
+            const icon = $('themeIcon');
+            const label = $('themeLabel');
+            if (theme === 'dark') {
+                icon.textContent = '☀️';
+                label.textContent = '浅色';
+            } else {
+                icon.textContent = '🌙';
+                label.textContent = '深色';
             }
-            const twoClass = images.length === 2 ? 'two' : '';
-            const imgsHtml = images.map(src => `<img src="${src}" alt="图片" onclick="openImgModal(event, this.src)" loading="lazy">`).join('');
-            return `<div class="detail-images multi ${twoClass}">${imgsHtml}</div>`;
         }
 
-        function renderVideos(videos) {
-            if (!videos || videos.length === 0) return '';
-            if (videos.length === 1) {
-                return `<div class="detail-videos single"><video controls src="${videos[0]}" preload="metadata" playsinline></video></div>`;
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme') || 'light';
+            applyTheme(current === 'dark' ? 'light' : 'dark');
+        }
+
+        applyTheme(getPreferredTheme());
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem(THEME_KEY)) {
+                applyTheme(e.matches ? 'dark' : 'light');
             }
-            const vidsHtml = videos.map(src => `<video controls src="${src}" preload="metadata" playsinline></video>`).join('');
-            return `<div class="detail-videos multi">${vidsHtml}</div>`;
+        });
+        $('themeToggle').addEventListener('click', toggleTheme);
+
+        // ================================================================
+        // 加载数据
+        // ================================================================
+        let configData = null;
+        let postData = null;
+
+        async function loadConfig() {
+            try {
+                const t = Date.now();
+                const cdnUrl =
+                    `https://cdn.jsdelivr.net/gh/${MANAGER_REPO}@main/${CONFIG_PATH}?t=${t}`;
+                let res = await fetch(cdnUrl, { cache: 'no-store' });
+                if (!res.ok) {
+                    const rawUrl =
+                        `https://raw.githubusercontent.com/${MANAGER_REPO}/main/${CONFIG_PATH}?t=${t}`;
+                    res = await fetch(rawUrl, { cache: 'no-store' });
+                    if (!res.ok) throw new Error('加载失败');
+                }
+                configData = await res.json();
+                return true;
+            } catch (err) {
+                console.warn('加载 config.json 失败', err);
+                configData = null;
+                return false;
+            }
         }
 
         async function loadPost() {
-            const container = document.getElementById('detailContent');
-            const sub = document.getElementById('detailSub');
+            const container = $('detailContent');
+            const sub = $('detailSub');
 
+            const postId = getUrlParam('postId');
             const filename = getUrlParam('file');
-            if (!filename) {
-                container.innerHTML = `<div class="error-state"><div class="icon">⚠️</div><div>没有指定文章</div></div>`;
-                sub.textContent = '加载失败';
+
+            // 优先从 config.json 加载（新数据）
+            if (postId) {
+                await loadConfig();
+                if (configData && configData.friends) {
+                    const friend = configData.friends.find(f => f.id === postId);
+                    if (friend) {
+                        renderFromConfig(friend);
+                        return;
+                    }
+                }
+                // 没找到，尝试从 CiweiBlog 加载
+                if (filename) {
+                    await loadFromBlog(filename);
+                    return;
+                }
+                container.innerHTML =
+                    `<div class="error-state"><div>❌ 未找到该朋友圈</div></div>`;
+                sub.textContent = '未找到';
                 return;
             }
+
+            // 从 CiweiBlog 加载（旧数据兼容）
+            if (filename) {
+                await loadFromBlog(filename);
+                return;
+            }
+
+            container.innerHTML =
+                `<div class="error-state"><div>❌ 没有指定文章</div></div>`;
+            sub.textContent = '加载失败';
+        }
+
+        // ================================================================
+        // 从 config.json 渲染
+        // ================================================================
+        function renderFromConfig(friend) {
+            const container = $('detailContent');
+            const sub = $('detailSub');
+
+            const title = friend.title || '无标题';
+            const date = formatDateToMinute(friend.date);
+            const content = friend.content || '';
+            const pinned = friend.pinned || false;
+            const modified = friend.modified || '';
+
+            const images = friend.images || [];
+            const videos = friend.videos || [];
+
+            sub.textContent = date;
+
+            // 渲染正文
+            const bodyHtml = renderMarkdown(content);
+
+            // 渲染图片
+            let imagesHtml = '';
+            if (images.length > 0) {
+                const cls = images.length === 1 ? 'single' : (images.length === 2 ? 'multi two' : 'multi');
+                imagesHtml =
+                    `<div class="detail-images ${cls}">${images.map(url => `<img src="${buildCdnUrl(url)}" alt="图片" loading="lazy" onclick="openImgModal(this.src)" />`).join('')}</div>`;
+            }
+
+            // 渲染视频
+            let videosHtml = '';
+            if (videos.length > 0) {
+                const cls = videos.length === 1 ? 'single' : (videos.length === 2 ? 'multi two' : 'multi');
+                videosHtml =
+                    `<div class="detail-videos ${cls}">${videos.map(url => `<video controls src="${buildCdnUrl(url)}" preload="metadata" playsinline></video>`).join('')}</div>`;
+            }
+
+            // 标签
+            const tags = friend.tags || [];
+            const tagsHtml = tags.length > 0 ?
+                `<div class="detail-tags">${tags.map(t => `<span class="tag">#${t}</span>`).join('')}</div>` : '';
+
+            // 徽章
+            const badgesHtml = `
+                    <div class="detail-badges">
+                        ${pinned ? '<span class="badge-pin">📌 置顶</span>' : ''}
+                        ${modified ? '<span class="badge-modified">✏️ 已修改</span>' : ''}
+                    </div>
+                `;
+
+            container.innerHTML = `
+                    <div class="detail-header">
+                        <div class="avatar"><img src="${AVATAR_URL}" alt="头像" loading="lazy"></div>
+                        <div class="info">
+                            <div class="name">${NICKNAME}</div>
+                            <div class="time">${date}</div>
+                        </div>
+                    </div>
+                    <div class="detail-title">${title}</div>
+                    ${badgesHtml}
+                    ${bodyHtml ? `<div class="detail-body">${bodyHtml}</div>` : ''}
+                    ${imagesHtml}
+                    ${videosHtml}
+                    ${tagsHtml}
+                `;
+
+            // 显示评论区
+            document.getElementById('commentSection').style.display = 'block';
+            initComments(friend.id || 'post', title);
+        }
+
+        // ================================================================
+        // 从 CiweiBlog 加载（兼容旧数据）
+        // ================================================================
+        async function loadFromBlog(filename) {
+            const container = $('detailContent');
+            const sub = $('detailSub');
 
             try {
                 let contentText = '';
 
-                const apiUrl = `https://api.github.com/repos/${BLOG_REPO}/contents/posts/${encodeURIComponent(filename)}`;
+                const apiUrl =
+                    `https://api.github.com/repos/${BLOG_REPO}/contents/posts/${encodeURIComponent(filename)}`;
                 let res = await fetch(apiUrl);
                 if (res.ok) {
                     const data = await res.json();
                     contentText = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
                 } else {
-                    const rawUrl = `https://raw.githubusercontent.com/${BLOG_REPO}/main/posts/${encodeURIComponent(filename)}`;
+                    const rawUrl =
+                        `https://raw.githubusercontent.com/${BLOG_REPO}/main/posts/${encodeURIComponent(filename)}`;
                     res = await fetch(rawUrl);
                     if (res.ok) {
                         contentText = await res.text();
@@ -398,7 +747,6 @@
                     }
                 }
 
-                // 解析 frontmatter
                 const lines = contentText.split('\n');
                 let title = filename.replace('.md', '');
                 let date = '未知日期';
@@ -415,7 +763,8 @@
                             if (line.startsWith('title:')) title = line.replace('title:', '').trim();
                             if (line.startsWith('date:')) date = line.replace('date:', '').trim();
                             if (line.startsWith('tags:')) tags = line.replace('tags:', '').trim();
-                            if (line.startsWith('pinned:')) pinned = line.replace('pinned:', '').trim() === 'true';
+                            if (line.startsWith('pinned:')) pinned = line.replace('pinned:', '').trim() ===
+                            'true';
                             if (line.startsWith('modified:')) modified = line.replace('modified:', '').trim();
                         });
                         bodyStart = end + 1;
@@ -427,79 +776,105 @@
                 const images = [];
                 const imgRegex = /!\[.*?\]\((.*?)\)/g;
                 let imgMatch;
-                while ((imgMatch = imgRegex.exec(body)) !== null) images.push(buildMediaUrl(imgMatch[1]));
+                while ((imgMatch = imgRegex.exec(body)) !== null) {
+                    let url = imgMatch[1];
+                    if (!url.startsWith('http')) {
+                        url = `https://cdn.jsdelivr.net/gh/${BLOG_REPO}@main/images/${url}`;
+                    }
+                    images.push(url);
+                }
 
                 const videos = [];
                 const vidRegex = /<video[^>]*src="([^"]*)"[^>]*>/g;
                 let vidMatch;
-                while ((vidMatch = vidRegex.exec(body)) !== null) videos.push(buildMediaUrl(vidMatch[1]));
+                while ((vidMatch = vidRegex.exec(body)) !== null) {
+                    let url = vidMatch[1];
+                    if (!url.startsWith('http')) {
+                        url = `https://cdn.jsdelivr.net/gh/${BLOG_REPO}@main/images/${url}`;
+                    }
+                    videos.push(url);
+                }
 
                 let textBody = body;
                 textBody = textBody.replace(/!\[.*?\]\(.*?\)/g, '');
                 textBody = textBody.replace(/<video[^>]*>.*?<\/video>/g, '');
                 textBody = textBody.replace(/\n{3,}/g, '\n\n').trim();
 
-                const imagesHtml = renderImages(images);
-                const videosHtml = renderVideos(videos);
+                const bodyHtml = textBody ? `<div class="detail-body">${textBody}</div>` : '';
+
+                let imagesHtml = '';
+                if (images.length > 0) {
+                    const cls = images.length === 1 ? 'single' : (images.length === 2 ? 'multi two' : 'multi');
+                    imagesHtml =
+                        `<div class="detail-images ${cls}">${images.map(url => `<img src="${url}" alt="图片" loading="lazy" onclick="openImgModal(this.src)" />`).join('')}</div>`;
+                }
+
+                let videosHtml = '';
+                if (videos.length > 0) {
+                    const cls = videos.length === 1 ? 'single' : (videos.length === 2 ? 'multi two' : 'multi');
+                    videosHtml =
+                        `<div class="detail-videos ${cls}">${videos.map(url => `<video controls src="${url}" preload="metadata" playsinline></video>`).join('')}</div>`;
+                }
+
                 const tagsArray = tags.split(',').map(t => t.trim()).filter(t => t);
                 const tagsHtml = tagsArray.length > 0 ?
-                    `<div class="detail-tags">${tagsArray.map(t => `<span class="tag">#${t}</span>`).join('')}</div>` : '';
+                    `<div class="detail-tags">${tagsArray.map(t => `<span class="tag">#${t}</span>`).join('')}</div>` :
+                    '';
 
-                // 徽章
                 const badgesHtml = `
-                    <div class="detail-badges">
-                        ${pinned ? '<span class="badge-pin">📌 置顶</span>' : ''}
-                        ${modified ? '<span class="badge-modified">✏️ 已修改</span>' : ''}
-                    </div>
-                `;
+                        <div class="detail-badges">
+                            ${pinned ? '<span class="badge-pin">📌 置顶</span>' : ''}
+                            ${modified ? '<span class="badge-modified">✏️ 已修改</span>' : ''}
+                        </div>
+                    `;
 
                 sub.textContent = date;
 
                 container.innerHTML = `
-                    <div class="detail-header">
-                        <div class="avatar"><img src="${AVATAR_URL}" alt="头像" loading="lazy"></div>
-                        <div class="info">
-                            <div class="name">${NICKNAME}</div>
-                            <div class="time">${date}</div>
+                        <div class="detail-header">
+                            <div class="avatar"><img src="${AVATAR_URL}" alt="头像" loading="lazy"></div>
+                            <div class="info">
+                                <div class="name">${NICKNAME}</div>
+                                <div class="time">${date}</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="detail-title">${title}</div>
-                    ${badgesHtml}
-                    ${textBody ? `<div class="detail-body">${textBody}</div>` : ''}
-                    ${imagesHtml}
-                    ${videosHtml}
-                    ${tagsHtml}
-                `;
+                        <div class="detail-title">${title}</div>
+                        ${badgesHtml}
+                        ${bodyHtml}
+                        ${imagesHtml}
+                        ${videosHtml}
+                        ${tagsHtml}
+                    `;
 
-                // 显示评论区
                 document.getElementById('commentSection').style.display = 'block';
-
-                // 初始化评论
                 initComments(filename, title);
 
             } catch (err) {
-                container.innerHTML = `
-                    <div class="error-state">
-                        <div class="icon">❌</div>
-                        <div>${err.message}</div>
-                    </div>
-                `;
+                container.innerHTML =
+                    `<div class="error-state"><div>❌ ${err.message}</div></div>`;
                 sub.textContent = '加载失败';
                 console.error('加载文章失败:', err);
             }
         }
 
-        // ========== 评论功能 (Cusdis) ==========
-        function initComments(filename, title) {
+        // ================================================================
+        // Cusdis 评论
+        // ================================================================
+        function initComments(pageId, title) {
             const thread = document.getElementById('cusdis_thread');
 
-            // 设置 Cusdis 配置
+            if (!thread) return;
+
+            // 如果已经初始化过了，先清空
+            thread.innerHTML = '';
+
             thread.setAttribute('data-host', 'https://cusdis.com');
             thread.setAttribute('data-app-id', CUSDIS_APP_ID);
-            thread.setAttribute('data-page-id', filename);
-            thread.setAttribute('data-page-url', `${window.location.origin}${window.location.pathname}?file=${encodeURIComponent(filename)}`);
+            thread.setAttribute('data-page-id', pageId);
+            thread.setAttribute('data-page-url', window.location.href);
             thread.setAttribute('data-page-title', title);
-            thread.setAttribute('data-theme', 'light');
+            thread.setAttribute('data-theme', document.documentElement.getAttribute('data-theme') === 'dark' ?
+                'dark' : 'light');
             thread.setAttribute('data-lang', 'zh-cn');
 
             // 加载 Cusdis 脚本
@@ -509,7 +884,7 @@
             script.defer = true;
             document.body.appendChild(script);
 
-            // 监听渲染完成，调整布局和昵称记忆
+            // 监听渲染完成
             const observer = new MutationObserver(() => {
                 adjustCusdisLayout();
                 setupNicknameMemory();
@@ -522,18 +897,18 @@
             }, 2000);
         }
 
-        // ========== 调整布局：评论在上，输入框在下 ==========
         function adjustCusdisLayout() {
             const thread = document.getElementById('cusdis_thread');
+            if (!thread) return;
 
             const commentList = thread.querySelector('.cusdis-comments') ||
-                                thread.querySelector('[class*="comment-list"]') ||
-                                thread.querySelector('[class*="comments"]');
+                thread.querySelector('[class*="comment-list"]') ||
+                thread.querySelector('[class*="comments"]');
 
             const inputArea = thread.querySelector('.cusdis-input') ||
-                              thread.querySelector('[class*="input-area"]') ||
-                              thread.querySelector('form') ||
-                              thread.querySelector('[class*="form"]');
+                thread.querySelector('[class*="input-area"]') ||
+                thread.querySelector('form') ||
+                thread.querySelector('[class*="form"]');
 
             if (commentList && inputArea) {
                 if (!(commentList.compareDocumentPosition(inputArea) & Node.DOCUMENT_POSITION_FOLLOWING)) {
@@ -542,15 +917,15 @@
             }
         }
 
-        // ========== 记住昵称 ==========
         function setupNicknameMemory() {
             const thread = document.getElementById('cusdis_thread');
+            if (!thread) return;
 
             const nicknameInput = thread.querySelector('input[name="nickname"]') ||
-                                  thread.querySelector('input[placeholder*="昵称"]') ||
-                                  thread.querySelector('input[placeholder*="名字"]') ||
-                                  thread.querySelector('input[placeholder*="name"]') ||
-                                  thread.querySelector('input[type="text"]');
+                thread.querySelector('input[placeholder*="昵称"]') ||
+                thread.querySelector('input[placeholder*="名字"]') ||
+                thread.querySelector('input[placeholder*="name"]') ||
+                thread.querySelector('input[type="text"]');
 
             if (!nicknameInput) return;
 
@@ -572,8 +947,11 @@
             }
         }
 
-        function openImgModal(event, src) {
-            event.stopPropagation();
+        // ================================================================
+        // 图片模态框
+        // ================================================================
+        function openImgModal(src) {
+            if (!src) return;
             const modal = document.getElementById('imgModal');
             const img = document.getElementById('modalImg');
             img.src = src;
@@ -590,7 +968,12 @@
             if (e.key === 'Escape') closeImgModal();
         });
 
+        // ================================================================
+        // 启动
+        // ================================================================
         loadPost();
+        console.log('🦔 Xiangqingye 已启动');
     </script>
+
 </body>
 </html>
