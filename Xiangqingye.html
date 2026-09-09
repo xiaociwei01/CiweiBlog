@@ -486,9 +486,6 @@
     </div>
 
     <script>
-        // ================================================================
-        // 配置
-        // ================================================================
         const MANAGER_REPO = 'xiaociwei01/CiweiManager';
         const CONFIG_PATH = 'config.json';
         const BLOG_REPO = 'xiaociwei01/CiweiBlog';
@@ -501,9 +498,6 @@
 
         const $ = id => document.getElementById(id);
 
-        // ================================================================
-        // 工具函数
-        // ================================================================
         function buildCdnUrl(path) {
             if (!path) return '';
             if (path.startsWith('http://') || path.startsWith('https://')) return path;
@@ -547,9 +541,7 @@
             return params.get(name);
         }
 
-        // ================================================================
-        // 主题
-        // ================================================================
+        // ===== 主题 =====
         function getPreferredTheme() {
             const saved = localStorage.getItem(THEME_KEY);
             if (saved === 'dark' || saved === 'light') return saved;
@@ -583,11 +575,8 @@
         });
         $('themeToggle').addEventListener('click', toggleTheme);
 
-        // ================================================================
-        // 加载数据
-        // ================================================================
+        // ===== 加载数据 =====
         let configData = null;
-        let postData = null;
 
         async function loadConfig() {
             try {
@@ -627,14 +616,8 @@
                         return;
                     }
                 }
-                // 没找到，尝试从 CiweiBlog 加载
-                if (filename) {
-                    await loadFromBlog(filename);
-                    return;
-                }
-                container.innerHTML =
-                    `<div class="error-state"><div>❌ 未找到该朋友圈</div></div>`;
-                sub.textContent = '未找到';
+                // 没找到，尝试用 postId 作为文件名从 CiweiBlog 加载
+                await loadFromBlog(postId + '.md');
                 return;
             }
 
@@ -649,9 +632,7 @@
             sub.textContent = '加载失败';
         }
 
-        // ================================================================
-        // 从 config.json 渲染
-        // ================================================================
+        // ===== 从 config.json 渲染 =====
         function renderFromConfig(friend) {
             const container = $('detailContent');
             const sub = $('detailSub');
@@ -667,10 +648,8 @@
 
             sub.textContent = date;
 
-            // 渲染正文
             const bodyHtml = renderMarkdown(content);
 
-            // 渲染图片
             let imagesHtml = '';
             if (images.length > 0) {
                 const cls = images.length === 1 ? 'single' : (images.length === 2 ? 'multi two' : 'multi');
@@ -678,7 +657,6 @@
                     `<div class="detail-images ${cls}">${images.map(url => `<img src="${buildCdnUrl(url)}" alt="图片" loading="lazy" onclick="openImgModal(this.src)" />`).join('')}</div>`;
             }
 
-            // 渲染视频
             let videosHtml = '';
             if (videos.length > 0) {
                 const cls = videos.length === 1 ? 'single' : (videos.length === 2 ? 'multi two' : 'multi');
@@ -686,12 +664,10 @@
                     `<div class="detail-videos ${cls}">${videos.map(url => `<video controls src="${buildCdnUrl(url)}" preload="metadata" playsinline></video>`).join('')}</div>`;
             }
 
-            // 标签
             const tags = friend.tags || [];
             const tagsHtml = tags.length > 0 ?
                 `<div class="detail-tags">${tags.map(t => `<span class="tag">#${t}</span>`).join('')}</div>` : '';
 
-            // 徽章
             const badgesHtml = `
                     <div class="detail-badges">
                         ${pinned ? '<span class="badge-pin">📌 置顶</span>' : ''}
@@ -715,14 +691,11 @@
                     ${tagsHtml}
                 `;
 
-            // 显示评论区
             document.getElementById('commentSection').style.display = 'block';
             initComments(friend.id || 'post', title);
         }
 
-        // ================================================================
-        // 从 CiweiBlog 加载（兼容旧数据）
-        // ================================================================
+        // ===== 从 CiweiBlog 加载（兼容旧数据） =====
         async function loadFromBlog(filename) {
             const container = $('detailContent');
             const sub = $('detailSub');
@@ -764,7 +737,7 @@
                             if (line.startsWith('date:')) date = line.replace('date:', '').trim();
                             if (line.startsWith('tags:')) tags = line.replace('tags:', '').trim();
                             if (line.startsWith('pinned:')) pinned = line.replace('pinned:', '').trim() ===
-                            'true';
+                                'true';
                             if (line.startsWith('modified:')) modified = line.replace('modified:', '').trim();
                         });
                         bodyStart = end + 1;
@@ -857,15 +830,11 @@
             }
         }
 
-        // ================================================================
-        // Cusdis 评论
-        // ================================================================
+        // ===== Cusdis 评论 =====
         function initComments(pageId, title) {
             const thread = document.getElementById('cusdis_thread');
-
             if (!thread) return;
 
-            // 如果已经初始化过了，先清空
             thread.innerHTML = '';
 
             thread.setAttribute('data-host', 'https://cusdis.com');
@@ -877,14 +846,12 @@
                 'dark' : 'light');
             thread.setAttribute('data-lang', 'zh-cn');
 
-            // 加载 Cusdis 脚本
             const script = document.createElement('script');
             script.src = 'https://cusdis.com/js/cusdis.es.js';
             script.async = true;
             script.defer = true;
             document.body.appendChild(script);
 
-            // 监听渲染完成
             const observer = new MutationObserver(() => {
                 adjustCusdisLayout();
                 setupNicknameMemory();
@@ -947,9 +914,6 @@
             }
         }
 
-        // ================================================================
-        // 图片模态框
-        // ================================================================
         function openImgModal(src) {
             if (!src) return;
             const modal = document.getElementById('imgModal');
@@ -968,11 +932,8 @@
             if (e.key === 'Escape') closeImgModal();
         });
 
-        // ================================================================
-        // 启动
-        // ================================================================
         loadPost();
-        console.log('🦔 Xiangqingye 已启动');
+        console.log('🦔 Xiangqingye 已启动（路径: CiweiBlog）');
     </script>
 
 </body>
