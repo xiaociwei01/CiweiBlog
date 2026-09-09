@@ -1119,23 +1119,22 @@
         }
 
         function parsePostToIndexItem(contentText, filename) {
-            const meta = parseFrontmatter(contentText);
-            const images = [...meta.body.matchAll(/!\[.*?\]\((.*?)\)/g)].map(m => buildMediaUrl(m[1]));
-            const videos = [...meta.body.matchAll(/<video[^>]*src="([^"]*)"[^>]*>/g)].map(m => buildMediaUrl(m[1]));
-            let textBody = meta.body.replace(/!\[.*?\]\(.*?\)/g, '').replace(/<video[^>]*>.*?<\/video>/g, '').replace(
-                /\n{3,}/g, '\n\n').trim();
-            return {
-                filename,
-                title: meta.title || filename.replace('.md', ''),
-                date: meta.date || '未知日期',
-                tags: meta.tags.split(',').map(t => t.trim()).filter(t => t),
-                body: textBody,
-                images,
-                videos,
-                pinned: meta.pinned,
-                modified: meta.modified
-            };
-        }
+    const meta = parseFrontmatter(contentText);
+    const images = [...meta.body.matchAll(/!\[.*?\]\((.*?)\)/g)].map(m => buildMediaUrl(m[1]));
+    const videos = [...meta.body.matchAll(/<video[^>]*src="([^"]*)"[^>]*>/g)].map(m => buildMediaUrl(m[1]));
+    let textBody = meta.body.replace(/!\[.*?\]\(.*?\)/g, '').replace(/<video[^>]*>.*?<\/video>/g, '').replace(/\n{3,}/g, '\n\n').trim();
+    return {
+        filename,
+        title: meta.title || filename.replace('.md', ''),
+        date: meta.date || '未知日期',
+        tags: meta.tags.split(',').map(t => t.trim()).filter(t => t),
+        body: textBody,
+        images,
+        videos,
+        pinned: meta.pinned,      // 👈 加上这一行
+        modified: meta.modified
+    };
+}
 
         async function rebuildIndex() {
             if (!token) {
