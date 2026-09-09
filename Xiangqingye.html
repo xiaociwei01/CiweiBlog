@@ -9,32 +9,55 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+
     <style>
+        /* ================================================================
+           深色/浅色模式
+        ================================================================ */
         :root {
-            --bg-body: #f5f6fa;
-            --bg-card: #ffffff;
-            --bg-card-hover: #f0f2f5;
+            --bg-body: #f0f2f5;
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --bg-card-hover: rgba(255, 255, 255, 0.95);
             --text-primary: #1a1a2e;
-            --text-secondary: #555;
-            --text-muted: #999;
-            --border-color: #e8ecf0;
-            --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.04);
+            --text-secondary: #444;
+            --text-muted: #888;
+            --border-color: rgba(0, 0, 0, 0.06);
+            --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.04);
+            --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.08);
+            --radius-lg: 20px;
             --radius-md: 14px;
-            --radius-lg: 18px;
             --transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-spring: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --accent: #58a6ff;
+            --accent-glow: rgba(88, 166, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --pinned-tag-bg: rgba(0, 0, 0, 0.06);
+            --pinned-tag-text: #888;
+            --modified-tag-bg: rgba(59, 130, 246, 0.10);
+            --modified-tag-text: #2563eb;
         }
 
         [data-theme="dark"] {
             --bg-body: #0a0a0f;
-            --bg-card: rgba(255, 255, 255, 0.06);
-            --bg-card-hover: rgba(255, 255, 255, 0.10);
+            --bg-card: rgba(255, 255, 255, 0.05);
+            --bg-card-hover: rgba(255, 255, 255, 0.08);
             --text-primary: #ffffff;
             --text-secondary: rgba(255, 255, 255, 0.75);
             --text-muted: rgba(255, 255, 255, 0.4);
             --border-color: rgba(255, 255, 255, 0.06);
-            --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.3);
+            --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.06);
+            --pinned-tag-bg: rgba(255, 255, 255, 0.06);
+            --pinned-tag-text: rgba(255, 255, 255, 0.4);
+            --modified-tag-bg: rgba(59, 130, 246, 0.15);
+            --modified-tag-text: #60a5fa;
         }
 
+        /* ================================================================
+           全局
+        ================================================================ */
         * {
             margin: 0;
             padding: 0;
@@ -50,8 +73,57 @@
             margin: 0 auto;
             min-height: 100vh;
             transition: background 0.5s ease, color 0.5s ease;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
 
+        /* ===== 动态光晕背景 ===== */
+        .bg-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .bg-glow::before,
+        .bg-glow::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.5;
+            transition: all 2s ease;
+        }
+        .bg-glow::before {
+            width: 500px;
+            height: 500px;
+            top: -10%;
+            left: -10%;
+            background: radial-gradient(circle, rgba(88, 166, 255, 0.12) 0%, transparent 70%);
+        }
+        .bg-glow::after {
+            width: 400px;
+            height: 400px;
+            bottom: -10%;
+            right: -10%;
+            background: radial-gradient(circle, rgba(255, 180, 60, 0.08) 0%, transparent 70%);
+        }
+        [data-theme="dark"] .bg-glow::before {
+            background: radial-gradient(circle, rgba(88, 166, 255, 0.18) 0%, transparent 70%);
+        }
+        [data-theme="dark"] .bg-glow::after {
+            background: radial-gradient(circle, rgba(255, 180, 60, 0.10) 0%, transparent 70%);
+        }
+
+        /* ===== 容器 ===== */
+        .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== 顶部导航 ===== */
         .nav-bar {
             display: flex;
             align-items: center;
@@ -71,10 +143,12 @@
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             transition: all var(--transition-base);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
         .nav-bar .back-link:hover {
             background: var(--bg-card-hover);
-            border-color: #58a6ff;
+            border-color: var(--accent);
         }
         .nav-bar .nav-title {
             font-size: 18px;
@@ -99,12 +173,26 @@
             color: var(--text-secondary);
             transition: all var(--transition-base);
             font-family: inherit;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
         .nav-bar .theme-toggle:hover {
             background: var(--bg-card-hover);
-            border-color: #58a6ff;
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+        .nav-bar .theme-toggle:active {
+            transform: scale(0.93);
+        }
+        .nav-bar .theme-toggle .theme-label {
+            font-size: 12px;
+            font-weight: 500;
         }
 
+        /* ===== 文章卡片（玻璃拟态） ===== */
         .detail-container {
             background: var(--bg-card);
             border-radius: var(--radius-lg);
@@ -113,8 +201,11 @@
             border: 1px solid var(--border-color);
             margin-bottom: 16px;
             transition: all 0.5s ease;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
         }
 
+        /* ===== 文章头部 ===== */
         .detail-header {
             display: flex;
             align-items: center;
@@ -126,8 +217,9 @@
             height: 44px;
             border-radius: 50%;
             overflow: hidden;
-            background: #e0e5ed;
+            background: var(--bg-body);
             flex-shrink: 0;
+            border: 1px solid var(--border-color);
         }
         .detail-header .avatar img {
             width: 100%;
@@ -151,6 +243,7 @@
             transition: color 0.5s ease;
         }
 
+        /* ===== 文章标题 ===== */
         .detail-title {
             font-size: 22px;
             font-weight: 700;
@@ -160,6 +253,7 @@
             transition: color 0.5s ease;
         }
 
+        /* ===== 徽章（微信风格） ===== */
         .detail-badges {
             display: flex;
             flex-wrap: wrap;
@@ -167,30 +261,27 @@
             margin-bottom: 12px;
         }
         .badge-pin {
-            background: #fef3c7;
-            color: #d97706;
-            padding: 2px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--pinned-tag-text);
+            background: var(--pinned-tag-bg);
+            padding: 2px 14px;
             border-radius: 12px;
-            font-size: 13px;
-            font-weight: 600;
+            border: 1px solid var(--border-color);
+            transition: all 0.5s ease;
         }
         .badge-modified {
-            background: #dbeafe;
-            color: #2563eb;
-            padding: 2px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--modified-tag-text);
+            background: var(--modified-tag-bg);
+            padding: 2px 14px;
             border-radius: 12px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-        [data-theme="dark"] .badge-pin {
-            background: rgba(245, 158, 11, 0.2);
-            color: #fbbf24;
-        }
-        [data-theme="dark"] .badge-modified {
-            background: rgba(59, 130, 246, 0.2);
-            color: #60a5fa;
+            border: 1px solid var(--border-color);
+            transition: all 0.5s ease;
         }
 
+        /* ===== 正文 ===== */
         .detail-body {
             font-size: 16px;
             line-height: 1.8;
@@ -205,14 +296,15 @@
         }
         .detail-body img {
             max-width: 100%;
-            border-radius: 10px;
+            border-radius: var(--radius-md);
             margin: 6px 0;
         }
 
+        /* ===== 图片网格 ===== */
         .detail-images {
             display: grid;
             gap: 4px;
-            border-radius: 12px;
+            border-radius: var(--radius-md);
             overflow: hidden;
             margin-top: 6px;
         }
@@ -226,7 +318,7 @@
             object-fit: contain;
             display: block;
             background: var(--bg-body);
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
         }
         .detail-images.multi {
@@ -244,13 +336,14 @@
             display: block;
             background: var(--bg-body);
             cursor: pointer;
-            border-radius: 4px;
+            border-radius: var(--radius-sm);
         }
 
+        /* ===== 视频网格 ===== */
         .detail-videos {
             display: grid;
             gap: 4px;
-            border-radius: 12px;
+            border-radius: var(--radius-md);
             overflow: hidden;
             margin-top: 6px;
             background: #000;
@@ -263,7 +356,7 @@
             width: 100%;
             max-height: 500px;
             display: block;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             background: #000;
         }
         .detail-videos.multi {
@@ -277,9 +370,10 @@
             object-fit: cover;
             display: block;
             background: #000;
-            border-radius: 4px;
+            border-radius: var(--radius-sm);
         }
 
+        /* ===== 标签 ===== */
         .detail-tags {
             margin-top: 14px;
             display: flex;
@@ -295,18 +389,24 @@
             transition: all 0.5s ease;
         }
 
+        /* ===== 加载/错误状态 ===== */
         .loading-state,
         .error-state {
             text-align: center;
             padding: 60px 20px;
             color: var(--text-muted);
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
         }
         .loading-state .spinner {
             display: inline-block;
             width: 28px;
             height: 28px;
             border: 3px solid var(--border-color);
-            border-top: 3px solid #58a6ff;
+            border-top: 3px solid var(--accent);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
             margin-bottom: 12px;
@@ -320,6 +420,7 @@
             color: #ef4444;
         }
 
+        /* ===== 评论区 ===== */
         .comment-section {
             background: var(--bg-card);
             border-radius: var(--radius-lg);
@@ -327,6 +428,8 @@
             box-shadow: var(--shadow-card);
             border: 1px solid var(--border-color);
             transition: all 0.5s ease;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
         }
         .comment-section .comment-title {
             font-size: 16px;
@@ -336,6 +439,7 @@
             transition: color 0.5s ease;
         }
 
+        /* ===== Cusdis 评论样式 ===== */
         #cusdis_thread {
             min-height: 100px;
         }
@@ -354,7 +458,7 @@
             order: 2;
             background: var(--bg-body);
             padding: 16px;
-            border-radius: 12px;
+            border-radius: var(--radius-md);
             border: 1px solid var(--border-color);
         }
         #cusdis_thread input[type="text"],
@@ -374,10 +478,10 @@
         }
         #cusdis_thread input:focus,
         #cusdis_thread textarea:focus {
-            border-color: #58a6ff;
+            border-color: var(--accent);
         }
         #cusdis_thread button[type="submit"] {
-            background: #58a6ff;
+            background: var(--accent);
             color: #fff;
             border: none;
             border-radius: 20px;
@@ -390,6 +494,7 @@
             background: #4a8edb;
         }
 
+        /* ===== 图片模态框 ===== */
         .img-modal {
             display: none;
             position: fixed;
@@ -398,6 +503,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(20px);
             z-index: 9999;
             align-items: center;
             justify-content: center;
@@ -422,6 +528,17 @@
             font-size: 13px;
         }
 
+        /* ================================================================
+           GSAP 初始隐藏
+        ================================================================ */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        /* ================================================================
+           响应式
+        ================================================================ */
         @media (max-width: 480px) {
             .detail-container {
                 padding: 16px 14px;
@@ -451,53 +568,91 @@
                 font-size: 12px;
                 padding: 4px 10px;
             }
+            .nav-bar .theme-toggle {
+                font-size: 12px;
+                padding: 4px 10px;
+            }
+            .nav-bar .theme-toggle .theme-label {
+                font-size: 10px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+            .reveal {
+                opacity: 1 !important;
+                transform: none !important;
+            }
         }
     </style>
 </head>
 <body>
 
-    <nav class="nav-bar">
-        <a class="back-link" href="index.html">← 返回</a>
-        <div class="nav-title">
-            📄 文章详情
-            <span class="sub" id="detailSub">加载中...</span>
-        </div>
-        <button class="theme-toggle" id="themeToggle">
-            <span id="themeIcon">🌙</span>
-            <span class="theme-label" id="themeLabel">深色</span>
-        </button>
-    </nav>
+    <!-- ===== 动态光晕背景 ===== -->
+    <div class="bg-glow"></div>
 
-    <div id="detailContent" class="detail-container">
-        <div class="loading-state">
-            <div class="spinner"></div>
-            <div>加载中...</div>
+    <!-- ===== 容器 ===== -->
+    <div class="container">
+
+        <!-- ===== 顶部导航 ===== -->
+        <nav class="nav-bar">
+            <a class="back-link" href="index.html">← 返回</a>
+            <div class="nav-title">
+                📄 文章详情
+                <span class="sub" id="detailSub">加载中...</span>
+            </div>
+            <button class="theme-toggle" id="themeToggle">
+                <span id="themeIcon">🌙</span>
+                <span class="theme-label" id="themeLabel">深色</span>
+            </button>
+        </nav>
+
+        <!-- ===== 文章内容 ===== -->
+        <div id="detailContent" class="detail-container">
+            <div class="loading-state">
+                <div class="spinner"></div>
+                <div>加载中...</div>
+            </div>
         </div>
+
+        <!-- ===== 评论区 ===== -->
+        <div class="comment-section" id="commentSection" style="display:none;">
+            <div class="comment-title">💬 评论</div>
+            <div id="cusdis_thread"></div>
+        </div>
+
     </div>
 
-    <div class="comment-section" id="commentSection" style="display:none;">
-        <div class="comment-title">💬 评论</div>
-        <div id="cusdis_thread"></div>
-    </div>
-
+    <!-- ===== 图片模态框 ===== -->
     <div class="img-modal" id="imgModal" onclick="closeImgModal()">
         <img id="modalImg" src="" alt="查看大图">
         <div class="close-hint">点击任意处关闭</div>
     </div>
 
     <script>
-        const MANAGER_REPO = 'xiaociwei01/CiweiManager';
-        const CONFIG_PATH = 'config.json';
+        // ================================================================
+        // 配置
+        // ================================================================
         const BLOG_REPO = 'xiaociwei01/CiweiBlog';
         const THEME_KEY = 'ciwei_home_theme';
         const AVATAR_URL = 'https://xiaociwei01.github.io/CiweiHome/ciweitouxiang.jpg';
         const NICKNAME = '小刺猬';
         const CUSDIS_APP_ID = 'ac50fafc-701b-4b4e-82c9-7e76f0f882c2';
         const NICKNAME_KEY = 'cusdis_nickname';
-        const DEFAULT_AVATAR = 'ciweitouxiang.jpg';
 
+        // ================================================================
+        // DOM 引用
+        // ================================================================
         const $ = id => document.getElementById(id);
+        const container = $('detailContent');
+        const sub = $('detailSub');
 
+        // ================================================================
+        // 工具函数
+        // ================================================================
         function buildCdnUrl(path) {
             if (!path) return '';
             if (path.startsWith('http://') || path.startsWith('https://')) return path;
@@ -505,10 +660,10 @@
             if (localImages.includes(path)) {
                 return `https://xiaociwei01.github.io/CiweiHome/${path}`;
             }
-            return `https://cdn.jsdelivr.net/gh/${MANAGER_REPO}@main/${path}`;
+            return `https://cdn.jsdelivr.net/gh/${BLOG_REPO}@main/${path}`;
         }
 
-        function formatDateToMinute(dateStr) {
+        function formatDate(dateStr) {
             if (!dateStr) return '未知日期';
             try {
                 const d = new Date(dateStr);
@@ -541,7 +696,9 @@
             return params.get(name);
         }
 
-        // ===== 主题 =====
+        // ================================================================
+        // 主题切换
+        // ================================================================
         function getPreferredTheme() {
             const saved = localStorage.getItem(THEME_KEY);
             if (saved === 'dark' || saved === 'light') return saved;
@@ -575,144 +732,35 @@
         });
         $('themeToggle').addEventListener('click', toggleTheme);
 
-        // ===== 加载数据 =====
-        let configData = null;
-
-        async function loadConfig() {
-            try {
-                const t = Date.now();
-                const cdnUrl =
-                    `https://cdn.jsdelivr.net/gh/${MANAGER_REPO}@main/${CONFIG_PATH}?t=${t}`;
-                let res = await fetch(cdnUrl, { cache: 'no-store' });
-                if (!res.ok) {
-                    const rawUrl =
-                        `https://raw.githubusercontent.com/${MANAGER_REPO}/main/${CONFIG_PATH}?t=${t}`;
-                    res = await fetch(rawUrl, { cache: 'no-store' });
-                    if (!res.ok) throw new Error('加载失败');
-                }
-                configData = await res.json();
-                return true;
-            } catch (err) {
-                console.warn('加载 config.json 失败', err);
-                configData = null;
-                return false;
-            }
-        }
-
+        // ================================================================
+        // 加载文章（原版逻辑）
+        // ================================================================
         async function loadPost() {
-            const container = $('detailContent');
-            const sub = $('detailSub');
-
-            const postId = getUrlParam('postId');
             const filename = getUrlParam('file');
 
-            // 优先从 config.json 加载（新数据）
-            if (postId) {
-                await loadConfig();
-                if (configData && configData.friends) {
-                    const friend = configData.friends.find(f => f.id === postId);
-                    if (friend) {
-                        renderFromConfig(friend);
-                        return;
-                    }
-                }
-                // 没找到，尝试用 postId 作为文件名从 CiweiBlog 加载
-                await loadFromBlog(postId + '.md');
+            if (!filename) {
+                container.innerHTML =
+                    `<div class="error-state"><div>❌ 没有指定文章</div></div>`;
+                sub.textContent = '加载失败';
                 return;
             }
-
-            // 从 CiweiBlog 加载（旧数据兼容）
-            if (filename) {
-                await loadFromBlog(filename);
-                return;
-            }
-
-            container.innerHTML =
-                `<div class="error-state"><div>❌ 没有指定文章</div></div>`;
-            sub.textContent = '加载失败';
-        }
-
-        // ===== 从 config.json 渲染 =====
-        function renderFromConfig(friend) {
-            const container = $('detailContent');
-            const sub = $('detailSub');
-
-            const title = friend.title || '无标题';
-            const date = formatDateToMinute(friend.date);
-            const content = friend.content || '';
-            const pinned = friend.pinned || false;
-            const modified = friend.modified || '';
-
-            const images = friend.images || [];
-            const videos = friend.videos || [];
-
-            sub.textContent = date;
-
-            const bodyHtml = renderMarkdown(content);
-
-            let imagesHtml = '';
-            if (images.length > 0) {
-                const cls = images.length === 1 ? 'single' : (images.length === 2 ? 'multi two' : 'multi');
-                imagesHtml =
-                    `<div class="detail-images ${cls}">${images.map(url => `<img src="${buildCdnUrl(url)}" alt="图片" loading="lazy" onclick="openImgModal(this.src)" />`).join('')}</div>`;
-            }
-
-            let videosHtml = '';
-            if (videos.length > 0) {
-                const cls = videos.length === 1 ? 'single' : (videos.length === 2 ? 'multi two' : 'multi');
-                videosHtml =
-                    `<div class="detail-videos ${cls}">${videos.map(url => `<video controls src="${buildCdnUrl(url)}" preload="metadata" playsinline></video>`).join('')}</div>`;
-            }
-
-            const tags = friend.tags || [];
-            const tagsHtml = tags.length > 0 ?
-                `<div class="detail-tags">${tags.map(t => `<span class="tag">#${t}</span>`).join('')}</div>` : '';
-
-            const badgesHtml = `
-                    <div class="detail-badges">
-                        ${pinned ? '<span class="badge-pin">📌 置顶</span>' : ''}
-                        ${modified ? '<span class="badge-modified">✏️ 已修改</span>' : ''}
-                    </div>
-                `;
-
-            container.innerHTML = `
-                    <div class="detail-header">
-                        <div class="avatar"><img src="${AVATAR_URL}" alt="头像" loading="lazy"></div>
-                        <div class="info">
-                            <div class="name">${NICKNAME}</div>
-                            <div class="time">${date}</div>
-                        </div>
-                    </div>
-                    <div class="detail-title">${title}</div>
-                    ${badgesHtml}
-                    ${bodyHtml ? `<div class="detail-body">${bodyHtml}</div>` : ''}
-                    ${imagesHtml}
-                    ${videosHtml}
-                    ${tagsHtml}
-                `;
-
-            document.getElementById('commentSection').style.display = 'block';
-            initComments(friend.id || 'post', title);
-        }
-
-        // ===== 从 CiweiBlog 加载（兼容旧数据） =====
-        async function loadFromBlog(filename) {
-            const container = $('detailContent');
-            const sub = $('detailSub');
 
             try {
                 let contentText = '';
 
+                // 1. 尝试从 GitHub API 加载
                 const apiUrl =
                     `https://api.github.com/repos/${BLOG_REPO}/contents/posts/${encodeURIComponent(filename)}`;
-                let res = await fetch(apiUrl);
+                let res = await fetch(apiUrl, { cache: 'no-store' });
+
                 if (res.ok) {
                     const data = await res.json();
                     contentText = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
                 } else {
+                    // 2. 回退到 raw
                     const rawUrl =
                         `https://raw.githubusercontent.com/${BLOG_REPO}/main/posts/${encodeURIComponent(filename)}`;
-                    res = await fetch(rawUrl);
+                    res = await fetch(rawUrl, { cache: 'no-store' });
                     if (res.ok) {
                         contentText = await res.text();
                     } else {
@@ -720,6 +768,7 @@
                     }
                 }
 
+                // 解析 frontmatter
                 const lines = contentText.split('\n');
                 let title = filename.replace('.md', '');
                 let date = '未知日期';
@@ -737,7 +786,7 @@
                             if (line.startsWith('date:')) date = line.replace('date:', '').trim();
                             if (line.startsWith('tags:')) tags = line.replace('tags:', '').trim();
                             if (line.startsWith('pinned:')) pinned = line.replace('pinned:', '').trim() ===
-                                'true';
+                            'true';
                             if (line.startsWith('modified:')) modified = line.replace('modified:', '').trim();
                         });
                         bodyStart = end + 1;
@@ -746,6 +795,7 @@
 
                 const body = lines.slice(bodyStart).join('\n').trim();
 
+                // 提取图片
                 const images = [];
                 const imgRegex = /!\[.*?\]\((.*?)\)/g;
                 let imgMatch;
@@ -757,6 +807,7 @@
                     images.push(url);
                 }
 
+                // 提取视频
                 const videos = [];
                 const vidRegex = /<video[^>]*src="([^"]*)"[^>]*>/g;
                 let vidMatch;
@@ -773,7 +824,8 @@
                 textBody = textBody.replace(/<video[^>]*>.*?<\/video>/g, '');
                 textBody = textBody.replace(/\n{3,}/g, '\n\n').trim();
 
-                const bodyHtml = textBody ? `<div class="detail-body">${textBody}</div>` : '';
+                // ===== 渲染 =====
+                const bodyHtml = textBody ? `<div class="detail-body">${renderMarkdown(textBody)}</div>` : '';
 
                 let imagesHtml = '';
                 if (images.length > 0) {
@@ -794,21 +846,23 @@
                     `<div class="detail-tags">${tagsArray.map(t => `<span class="tag">#${t}</span>`).join('')}</div>` :
                     '';
 
+                // ===== 微信风格徽章 =====
                 const badgesHtml = `
                         <div class="detail-badges">
-                            ${pinned ? '<span class="badge-pin">📌 置顶</span>' : ''}
+                            ${pinned ? '<span class="badge-pin">🔝 置顶</span>' : ''}
                             ${modified ? '<span class="badge-modified">✏️ 已修改</span>' : ''}
                         </div>
                     `;
 
-                sub.textContent = date;
+                const displayDate = formatDate(date);
+                sub.textContent = displayDate;
 
                 container.innerHTML = `
                         <div class="detail-header">
                             <div class="avatar"><img src="${AVATAR_URL}" alt="头像" loading="lazy"></div>
                             <div class="info">
                                 <div class="name">${NICKNAME}</div>
-                                <div class="time">${date}</div>
+                                <div class="time">${displayDate}</div>
                             </div>
                         </div>
                         <div class="detail-title">${title}</div>
@@ -819,8 +873,12 @@
                         ${tagsHtml}
                     `;
 
+                // 显示评论区
                 document.getElementById('commentSection').style.display = 'block';
                 initComments(filename, title);
+
+                // 启动 GSAP
+                initGSAP();
 
             } catch (err) {
                 container.innerHTML =
@@ -830,7 +888,9 @@
             }
         }
 
-        // ===== Cusdis 评论 =====
+        // ================================================================
+        // Cusdis 评论
+        // ================================================================
         function initComments(pageId, title) {
             const thread = document.getElementById('cusdis_thread');
             if (!thread) return;
@@ -846,12 +906,14 @@
                 'dark' : 'light');
             thread.setAttribute('data-lang', 'zh-cn');
 
+            // 加载 Cusdis 脚本
             const script = document.createElement('script');
             script.src = 'https://cusdis.com/js/cusdis.es.js';
             script.async = true;
             script.defer = true;
             document.body.appendChild(script);
 
+            // 监听渲染完成
             const observer = new MutationObserver(() => {
                 adjustCusdisLayout();
                 setupNicknameMemory();
@@ -914,6 +976,9 @@
             }
         }
 
+        // ================================================================
+        // 图片模态框
+        // ================================================================
         function openImgModal(src) {
             if (!src) return;
             const modal = document.getElementById('imgModal');
@@ -932,8 +997,60 @@
             if (e.key === 'Escape') closeImgModal();
         });
 
+        // ================================================================
+        // GSAP 入场动画
+        // ================================================================
+        function initGSAP() {
+            if (typeof gsap === 'undefined') {
+                setTimeout(initGSAP, 500);
+                return;
+            }
+
+            const details = document.querySelector('.detail-container');
+            if (details) {
+                gsap.from(details, {
+                    opacity: 0,
+                    y: 40,
+                    scale: 0.96,
+                    duration: 0.8,
+                    ease: 'power4.out',
+                    delay: 0.1,
+                });
+            }
+
+            const commentSection = document.querySelector('.comment-section');
+            if (commentSection) {
+                gsap.from(commentSection, {
+                    opacity: 0,
+                    y: 30,
+                    scale: 0.96,
+                    duration: 0.7,
+                    ease: 'power4.out',
+                    delay: 0.25,
+                });
+            }
+
+            const nav = document.querySelector('.nav-bar');
+            if (nav) {
+                gsap.from(nav, {
+                    opacity: 0,
+                    y: -20,
+                    duration: 0.5,
+                    ease: 'power3.out',
+                    delay: 0.05,
+                });
+            }
+
+            console.log('🚀 Xiangqingye GSAP 动画已启动');
+        }
+
+        // ================================================================
+        // 启动
+        // ================================================================
         loadPost();
-        console.log('🦔 Xiangqingye 已启动（路径: CiweiBlog）');
+
+        console.log('🦔 Xiangqingye 已启动（风格统一版）');
+        console.log('📦 博客仓库:', BLOG_REPO);
     </script>
 
 </body>
