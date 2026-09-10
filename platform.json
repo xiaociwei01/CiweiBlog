@@ -1,4 +1,4 @@
 {
-  "netlify": false,
+  "netlify": true,
   "github": true
 }
